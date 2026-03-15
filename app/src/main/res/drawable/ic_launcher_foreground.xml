@@ -1,28 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp" android:height="108dp"
-    android:viewportWidth="108" android:viewportHeight="108">
-  <!-- Outer glow ring -->
-  <path android:fillColor="#30E83D7A"
-      android:pathData="M54,18 C34.12,18 18,34.12 18,54 C18,73.88 34.12,90 54,90 C73.88,90 90,73.88 90,54 C90,34.12 73.88,18 54,18 Z"/>
-  <!-- Inner circle -->
-  <path android:fillColor="#E83D7A"
-      android:pathData="M54,26 C38.54,26 26,38.54 26,54 C26,69.46 38.54,82 54,82 C69.46,82 82,69.46 82,54 C82,38.54 69.46,26 54,26 Z"/>
-  <!-- Sakura petal 1 -->
-  <path android:fillColor="#FFFFFF"
-      android:pathData="M54,32 C54,32 50,40 54,46 C58,40 54,32 54,32 Z"/>
-  <!-- Sakura petal 2 -->
-  <path android:fillColor="#FFFFFF"
-      android:pathData="M54,76 C54,76 50,68 54,62 C58,68 54,76 54,76 Z"/>
-  <!-- Sakura petal 3 -->
-  <path android:fillColor="#FFFFFF"
-      android:pathData="M32,54 C32,54 40,50 46,54 C40,58 32,54 32,54 Z"/>
-  <!-- Sakura petal 4 -->
-  <path android:fillColor="#FFFFFF"
-      android:pathData="M76,54 C76,54 68,50 62,54 C68,58 76,54 76,54 Z"/>
-  <!-- Center circle -->
-  <path android:fillColor="#FF6FA3"
-      android:pathData="M54,48 C50.69,48 48,50.69 48,54 C48,57.31 50.69,60 54,60 C57.31,60 60,57.31 60,54 C60,50.69 57.31,48 54,48 Z"/>
-  <!-- M letter -->
-  <path android:fillColor="#FFFFFF"
-      android:pathData="M44,48 L48,48 L54,55 L60,48 L64,48 L64,62 L60,62 L60,54 L54,61 L48,54 L48,62 L44,62 Z"/>
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Outer pink glow ring -->
+    <path
+        android:fillColor="#30E83D7A"
+        android:pathData="M54,12 C30.8,12 12,30.8 12,54 C12,77.2 30.8,96 54,96 C77.2,96 96,77.2 96,54 C96,30.8 77.2,12 54,12 Z"/>
+
+    <!-- Inner dark circle -->
+    <path
+        android:fillColor="#1A0A20"
+        android:pathData="M54,20 C35.2,20 20,35.2 20,54 C20,72.8 35.2,88 54,88 C72.8,88 88,72.8 88,54 C88,35.2 72.8,20 54,20 Z"/>
+
+    <!-- Sakura petal top -->
+    <path
+        android:fillColor="#E83D7A"
+        android:pathData="M54,28 C51,28 49,33 50,38 C51,43 54,45 54,45 C54,45 57,43 58,38 C59,33 57,28 54,28 Z"/>
+
+    <!-- Sakura petal bottom -->
+    <path
+        android:fillColor="#E83D7A"
+        android:pathData="M54,80 C51,80 49,75 50,70 C51,65 54,63 54,63 C54,63 57,65 58,70 C59,75 57,80 54,80 Z"/>
+
+    <!-- Sakura petal left -->
+    <path
+        android:fillColor="#E83D7A"
+        android:pathData="M28,54 C28,51 33,49 38,50 C43,51 45,54 45,54 C45,54 43,57 38,58 C33,59 28,57 28,54 Z"/>
+
+    <!-- Sakura petal right -->
+    <path
+        android:fillColor="#E83D7A"
+        android:pathData="M80,54 C80,51 75,49 70,50 C65,51 63,54 63,54 C63,54 65,57 70,58 C75,59 80,57 80,54 Z"/>
+
+    <!-- Center circle -->
+    <path
+        android:fillColor="#FF6FA3"
+        android:pathData="M54,46 C49.6,46 46,49.6 46,54 C46,58.4 49.6,62 54,62 C58.4,62 62,58.4 62,54 C62,49.6 58.4,46 54,46 Z"/>
+
+    <!-- Letter M -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M44,50 L47,50 L54,57 L61,50 L64,50 L64,60 L61,60 L61,54 L54,61 L47,54 L47,60 L44,60 Z"/>
+
 </vector>
