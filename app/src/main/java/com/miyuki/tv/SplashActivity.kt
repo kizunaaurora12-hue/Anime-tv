@@ -15,8 +15,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.miyuki.tv.databinding.ActivitySplashBinding
 import com.miyuki.tv.extension.toStringContributor
-import com.miyuki.tv.extension.toRequest
 import com.miyuki.tv.extension.mergeWith
+import com.miyuki.tv.extension.toRequest
 import com.miyuki.tv.extra.HttpClient
 import com.miyuki.tv.extra.LocaleHelper
 import com.miyuki.tv.extra.Preferences
