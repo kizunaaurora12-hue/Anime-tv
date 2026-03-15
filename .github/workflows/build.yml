@@ -27,13 +27,18 @@ jobs:
       with:
         gradle-version: '7.3.3'
 
-    - name: Fix gradlew permissions and line endings
+    - name: Fix gradlew
       run: |
         sed -i 's/\r//' gradlew
         chmod +x gradlew
 
     - name: Build Release APK
-      run: gradle assembleRelease
+      run: |
+        gradle assembleRelease \
+          -Dorg.gradle.jvmargs="-Xmx2g --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED"
+
+    - name: Find APK
+      run: find . -name "*.apk" | head -5
 
     - name: Sign APK
       run: |
@@ -43,6 +48,7 @@ jobs:
           -storepass miyuki2025 -keypass miyuki2025 -noprompt
 
         APKSIGNER="$(find ${ANDROID_HOME}/build-tools/ -name 'apksigner' | sort -r | head -1)"
+        echo "Using: $APKSIGNER"
 
         $APKSIGNER sign \
           --ks miyuki.keystore \
