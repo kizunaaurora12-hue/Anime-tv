@@ -15,11 +15,13 @@ class TrackSelectionDialog : DialogFragment() {
 
     companion object {
         fun createForTrackSelector(ts: DefaultTrackSelector, onDismiss: () -> Unit) =
-            TrackSelectionDialog().apply { this.trackSelector = ts; this.onDismiss = onDismiss }
+            TrackSelectionDialog().apply { trackSelector = ts; this.onDismiss = onDismiss }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
-        AppCompatDialog(activity, R.style.SettingsDialogThemeOverlay).apply { setTitle(R.string.track_selection_title) }
+        AppCompatDialog(activity, R.style.SettingsDialogThemeOverlay).apply {
+            setTitle(R.string.track_selection_title)
+        }
 
     override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?): View {
         val b = TrackSelectionDialogBinding.inflate(i, c, false)
@@ -27,5 +29,8 @@ class TrackSelectionDialog : DialogFragment() {
         return b.root
     }
 
-    override fun onDismiss(dialog: android.content.DialogInterface) { super.onDismiss(dialog); onDismiss?.invoke() }
+    override fun onDismiss(dialog: android.content.DialogInterface) {
+        super.onDismiss(dialog)
+        onDismiss?.invoke()
+    }
 }
