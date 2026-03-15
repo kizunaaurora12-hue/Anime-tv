@@ -22,6 +22,7 @@ import com.google.android.exoplayer2.drm.*
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.*
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.MimeTypes
 import com.miyuki.tv.databinding.ActivityPlayerBinding
 import com.miyuki.tv.databinding.CustomControlBinding
@@ -216,7 +217,7 @@ class PlayerActivity : AppCompatActivity() {
             .setAllowCrossProtocolRedirects(true)
             .setUserAgent(ua)
         if (ref != null) httpFactory.setDefaultRequestProperties(mapOf("referer" to ref))
-        val dsFactory = DefaultDataSource.Factory(this, httpFactory)
+        val dsFactory = DefaultDataSourceFactory(this, httpFactory)
 
         var dsm: DrmSessionManager = DrmSessionManager.DRM_UNSUPPORTED
         if (hasDrm && isCK) {
@@ -261,7 +262,7 @@ class PlayerActivity : AppCompatActivity() {
         val mediaItem = MediaItem.Builder().setUri(Uri.parse(url))
             .also { if (mimeType != null) it.setMimeType(mimeType) }.build()
 
-        val msFactory = DefaultMediaSourceFactory(dsFactory)
+        val msFactory = DefaultMediaSourceFactory(dsFactory as com.google.android.exoplayer2.upstream.DataSource.Factory)
             .setDrmSessionManagerProvider { dsm }
 
         trackSelector = DefaultTrackSelector(this).apply {
