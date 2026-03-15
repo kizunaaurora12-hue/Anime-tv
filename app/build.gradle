@@ -20,6 +20,7 @@ android {
     }
 
     compileSdk 33
+    buildToolsVersion "33.0.2"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -94,7 +95,7 @@ dependencies {
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
     implementation 'androidx.activity:activity-ktx:1.6.1'
 
-    // ExoPlayer 2.18.1 - butuh compileSdk 33
+    // ExoPlayer 2.18.1
     def exo_version = "2.18.1"
     implementation "com.google.android.exoplayer:exoplayer-core:$exo_version"
     implementation "com.google.android.exoplayer:exoplayer-dash:$exo_version"
