@@ -34,7 +34,7 @@
     <string name="alert_title_playlist_error">Gagal Memuat</string>
     <string name="alert_new_update">Update Tersedia ✦</string>
     <string name="alert_first_time">Selamat datang di MiyukiTV!\n\nAplikasi streaming premium bertema anime.\n\nNikmati channel favorit dengan kualitas terbaik.\n\nTap OK untuk mulai.</string>
-    <string name="message_update">Versi saat ini: %s (build %d)\nVersi baru: %s (build %d)\n\nChangelog:\n</string>
+    <string name="message_update" formatted="false">Versi saat ini: %s (build %d)\nVersi baru: %s (build %d)\n\nChangelog:\n</string>
     <string name="message_update_changelog">\u2022 %s\n</string>
     <string name="message_update_no_changelog">Tidak ada catatan perubahan.</string>
 
