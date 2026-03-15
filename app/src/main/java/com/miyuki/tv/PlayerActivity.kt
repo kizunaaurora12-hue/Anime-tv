@@ -13,16 +13,20 @@ import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.drm.*
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.*
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.MimeTypes
 import com.miyuki.tv.databinding.ActivityPlayerBinding
 import com.miyuki.tv.databinding.CustomControlBinding
@@ -47,6 +51,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var bindingControl: CustomControlBinding
     private var handlerInfo: Handler? = null
     private var isLocked = false
+    private var isPanelOpen = false
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
@@ -104,16 +109,28 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun bindListeners() {
+        // Player touch - tap untuk toggle control
         bindingRoot.playerView.apply {
             setOnTouchListener(object : OnSwipeTouchListener() {
-                override fun onSwipeDown()  { switchChannel(CAT_UP) }
-                override fun onSwipeUp()    { switchChannel(CAT_DOWN) }
-                override fun onSwipeLeft()  { switchChannel(CH_NEXT) }
-                override fun onSwipeRight() { switchChannel(CH_PREV) }
+                override fun onSwipeDown()  { if (!isPanelOpen) switchChannel(CAT_UP) }
+                override fun onSwipeUp()    { if (!isPanelOpen) switchChannel(CAT_DOWN) }
+                override fun onSwipeLeft()  { if (!isPanelOpen) switchChannel(CH_NEXT) }
+                override fun onSwipeRight() { if (!isPanelOpen) switchChannel(CH_PREV) }
+                override fun onClick() {
+                    if (isPanelOpen) { closeChannelPanel(); return }
+                    if (isControllerVisible) hideController() else showController()
+                }
             })
+            // Control auto-hide 5 detik
+            controllerShowTimeoutMs = 5000
             setControllerVisibilityListener { setChannelInfo(it == View.VISIBLE) }
         }
+
         bindingControl.apply {
+            // Tombol channel list
+            buttonChannelList.setOnClickListener {
+                if (isPanelOpen) closeChannelPanel() else openChannelPanel()
+            }
             trackSelection.setOnClickListener { showTrackSelector() }
             buttonExit.apply {
                 visibility = if (isTelevision) View.GONE else View.VISIBLE
@@ -134,9 +151,148 @@ class PlayerActivity : AppCompatActivity() {
                     lockControl(!isLocked); true
                 }
             }
+
+            // Tombol resolusi
+            resBtnAuto.setOnClickListener  { setResolution(null,  resBtnAuto) }
+            resBtn360.setOnClickListener   { setResolution(360,   resBtn360) }
+            resBtn480.setOnClickListener   { setResolution(480,   resBtn480) }
+            resBtn720.setOnClickListener   { setResolution(720,   resBtn720) }
+            resBtn1080.setOnClickListener  { setResolution(1080,  resBtn1080) }
         }
+
+        // Panel close button
+        bindingRoot.root.findViewById<android.view.View>(R.id.panel_close).setOnClickListener { closeChannelPanel() }
     }
 
+    // ── Resolusi ─────────────────────────────────────────────────────────────
+    private fun setResolution(heightPx: Int?, activeBtn: TextView) {
+        // Reset semua tombol
+        listOf(
+            bindingControl.resBtnAuto,
+            bindingControl.resBtn360,
+            bindingControl.resBtn480,
+            bindingControl.resBtn720,
+            bindingControl.resBtn1080
+        ).forEach {
+            it.setTextColor(getColor(R.color.color_text_secondary))
+            it.setBackgroundResource(R.drawable.res_btn_bg)
+        }
+        activeBtn.setTextColor(getColor(R.color.color_primary))
+        activeBtn.setBackgroundResource(R.drawable.res_btn_active_bg)
+
+        val params = trackSelector.buildUponParameters()
+        if (heightPx == null) {
+            params.clearVideoSizeConstraints()
+        } else {
+            params.setMaxVideoSize(Int.MAX_VALUE, heightPx)
+                  .setMinVideoSize(0, 0)
+        }
+        trackSelector.setParameters(params)
+    }
+
+    // ── Channel panel ─────────────────────────────────────────────────────────
+    private fun openChannelPanel() {
+        isPanelOpen = true
+        val panel = bindingRoot.root.findViewById<android.view.View>(R.id.panel_channel_list)
+        panel.visibility = View.VISIBLE
+
+        // Set nama kategori
+        bindingRoot.root.findViewById<android.widget.TextView>(R.id.panel_cat_name).text = category?.name?.uppercase()
+
+        // Setup RecyclerView
+        val channels = category?.channels ?: return
+        val catIdx   = Playlist.cached.categories.indexOf(category)
+        val currentIdx = channels.indexOf(current)
+
+        val rv = bindingRoot.root.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.panel_rv_channels)
+        rv.layoutManager = LinearLayoutManager(this)
+        rv.adapter = PanelChannelAdapter(channels, currentIdx) { ch, chIdx ->
+            current = ch
+            preferences.watched = PlayData(catIdx, chIdx)
+            playChannel()
+            closeChannelPanel()
+        }
+        // Scroll ke channel yang sedang diputar
+        if (currentIdx >= 0) rv.scrollToPosition(currentIdx)
+
+        // Keep control visible saat panel terbuka
+        bindingRoot.playerView.controllerShowTimeoutMs = 0
+        bindingRoot.playerView.showController()
+    }
+
+    private fun closeChannelPanel() {
+        isPanelOpen = false
+        bindingRoot.root.findViewById<android.view.View>(R.id.panel_channel_list).visibility = View.GONE
+        bindingRoot.playerView.controllerShowTimeoutMs = 5000
+    }
+
+    // ── Adapter inline untuk panel ────────────────────────────────────────────
+    inner class PanelChannelAdapter(
+        private val channels: ArrayList<Channel>,
+        private val currentIdx: Int,
+        private val onSelect: (Channel, Int) -> Unit
+    ) : RecyclerView.Adapter<PanelChannelAdapter.VH>() {
+
+        inner class VH(v: View) : RecyclerView.ViewHolder(v) {
+            val img:     android.widget.ImageView = v.findViewById(R.id.panel_ch_img)
+            val initial: TextView = v.findViewById(R.id.panel_ch_initial)
+            val name:    TextView = v.findViewById(R.id.panel_ch_name)
+            val drm:     TextView = v.findViewById(R.id.panel_ch_drm)
+            val root:    View     = v.findViewById(R.id.panel_ch_root)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
+            val v = layoutInflater.inflate(R.layout.item_panel_channel, parent, false)
+            return VH(v)
+        }
+
+        override fun onBindViewHolder(h: VH, pos: Int) {
+            val ch = channels[pos]
+            h.name.text = ch.name
+
+            // Highlight channel aktif
+            val isActive = pos == currentIdx
+            h.root.setBackgroundResource(
+                if (isActive) R.drawable.sidebar_item_selected_bg
+                else android.R.color.transparent
+            )
+            h.name.setTextColor(
+                if (isActive) getColor(R.color.color_primary)
+                else getColor(R.color.color_text)
+            )
+
+            // Logo
+            if (!ch.logo.isNullOrBlank()) {
+                Glide.with(this@PlayerActivity)
+                    .load(ch.logo)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(android.R.color.transparent)
+                    .listener(object : com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
+                        override fun onLoadFailed(e: com.bumptech.glide.load.engine.GlideException?, m: Any?,
+                            t: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>?, f: Boolean): Boolean {
+                            h.img.visibility = View.GONE; h.initial.visibility = View.VISIBLE
+                            h.initial.text = ch.name?.take(1)?.uppercase() ?: "?"; return false
+                        }
+                        override fun onResourceReady(r: android.graphics.drawable.Drawable?, m: Any?,
+                            t: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>?,
+                            d: com.bumptech.glide.load.DataSource?, f: Boolean): Boolean {
+                            h.img.visibility = View.VISIBLE; h.initial.visibility = View.GONE; return false
+                        }
+                    }).into(h.img)
+            } else {
+                h.img.visibility = View.GONE
+                h.initial.visibility = View.VISIBLE
+                h.initial.text = ch.name?.take(1)?.uppercase() ?: "?"
+            }
+
+            h.drm.visibility = if (ch.drmName != null) View.VISIBLE else View.GONE
+            h.root.setOnClickListener { onSelect(ch, pos) }
+        }
+
+        override fun getItemCount() = channels.size
+    }
+
+    // ── Channel info overlay ──────────────────────────────────────────────────
     private fun setChannelInfo(visible: Boolean) {
         if (isLocked) return
         bindingRoot.layoutInfo.visibility = if (visible && !isPipMode) View.VISIBLE else View.INVISIBLE
@@ -145,7 +301,7 @@ class PlayerActivity : AppCompatActivity() {
         handlerInfo?.removeCallbacksAndMessages(null)
         handlerInfo?.postDelayed({
             bindingRoot.layoutInfo.visibility = View.INVISIBLE
-        }, bindingRoot.playerView.controllerShowTimeoutMs.toLong())
+        }, 3000L)
     }
 
     private fun lockControl(locked: Boolean) {
@@ -169,6 +325,7 @@ class PlayerActivity : AppCompatActivity() {
         bindingControl.buttonForward.visibility = seekVis
     }
 
+    // ── Channel switching ─────────────────────────────────────────────────────
     private fun switchChannel(dir: Int): Boolean {
         val cats = Playlist.cached.categories
         val ci   = cats.indexOf(category)
@@ -182,12 +339,15 @@ class PlayerActivity : AppCompatActivity() {
             CAT_UP   -> { category = cats[if (ci-1<0) cats.size-1 else ci-1]; current = category?.channels?.firstOrNull() }
             CAT_DOWN -> { category = cats[(ci+1) % cats.size]; current = category?.channels?.firstOrNull() }
         }
-        val rci = cats.indexOf(category)
+        val rci  = cats.indexOf(category)
         val rchi = category?.channels?.indexOf(current) ?: 0
         if (rci >= 0) preferences.watched = PlayData(rci, rchi)
+        // Update panel kalau sedang terbuka
+        if (isPanelOpen) openChannelPanel()
         playChannel(); return true
     }
 
+    // ── Play ──────────────────────────────────────────────────────────────────
     private fun hexToBytes(hex: String): ByteArray {
         val d = ByteArray(hex.length / 2)
         for (i in d.indices) d[i] = ((Character.digit(hex[i*2],16) shl 4) + Character.digit(hex[i*2+1],16)).toByte()
@@ -240,7 +400,6 @@ class PlayerActivity : AppCompatActivity() {
                     .setUuidAndExoMediaDrmProvider(C.CLEARKEY_UUID, FrameworkMediaDrm.DEFAULT_PROVIDER)
                     .setMultiSession(false)
                     .build(LocalMediaDrmCallback(json.toString().toByteArray()))
-                Log.d("DRM","ClearKey OK")
             } catch (e: Exception) { Log.e("DRM","ClearKey: ${e.message}") }
         } else if (hasDrm && isWV) {
             if (!MediaDrm.isCryptoSchemeSupported(C.WIDEVINE_UUID)) {
@@ -251,11 +410,10 @@ class PlayerActivity : AppCompatActivity() {
                 .setUuidAndExoMediaDrmProvider(C.WIDEVINE_UUID, FrameworkMediaDrm.DEFAULT_PROVIDER)
                 .setMultiSession(true)
                 .build(HttpMediaDrmCallback(drmLic, httpFactory))
-            Log.d("DRM","Widevine OK")
         }
 
         val mimeType = when {
-            url.contains(".mpd",  true) || url.contains("/dash", true) -> MimeTypes.APPLICATION_MPD
+            url.contains(".mpd", true) || url.contains("/dash", true) -> MimeTypes.APPLICATION_MPD
             url.contains(".m3u8", true) -> MimeTypes.APPLICATION_M3U8
             else -> null
         }
@@ -290,12 +448,15 @@ class PlayerActivity : AppCompatActivity() {
             }
         })
 
-        bindingRoot.playerView.player       = player
-        bindingRoot.playerView.resizeMode   = preferences.resizeMode
+        bindingRoot.playerView.player        = player
+        bindingRoot.playerView.resizeMode    = preferences.resizeMode
         bindingRoot.playerView.useController = true
         player?.setMediaItem(mediaItem)
         player?.prepare()
         player?.playWhenReady = true
+
+        // Reset resolusi ke Auto saat ganti channel
+        setResolution(null, bindingControl.resBtnAuto)
     }
 
     private fun showError(msg: String) {
@@ -372,6 +533,9 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK && isPanelOpen) {
+            closeChannelPanel(); return true
+        }
         if (!bindingRoot.playerView.isControllerVisible && keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
             bindingRoot.playerView.showController(); return true
         }
@@ -398,6 +562,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        if (isPanelOpen) { closeChannelPanel(); return }
         if (isLocked) return
         if (isTelevision || doubleBackToExitPressedOnce) { super.onBackPressed(); finish(); return }
         doubleBackToExitPressedOnce = true
