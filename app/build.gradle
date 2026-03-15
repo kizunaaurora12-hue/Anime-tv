@@ -22,6 +22,8 @@ android {
     compileSdk 33
     buildToolsVersion "33.0.2"
 
+    namespace "com.miyuki.tv"
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -95,12 +97,14 @@ dependencies {
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
     implementation 'androidx.activity:activity-ktx:1.6.1'
 
-    // ExoPlayer 2.18.1
-    def exo_version = "2.18.1"
-    implementation "com.google.android.exoplayer:exoplayer-core:$exo_version"
-    implementation "com.google.android.exoplayer:exoplayer-dash:$exo_version"
-    implementation "com.google.android.exoplayer:exoplayer-hls:$exo_version"
-    implementation "com.google.android.exoplayer:exoplayer-ui:$exo_version"
+    // Media3 ExoPlayer - 100% AndroidX, pengganti resmi ExoPlayer 2.x
+    // Tidak ada partial migration, tidak ada colorFilter issue
+    def media3_version = "1.0.2"
+    implementation "androidx.media3:media3-exoplayer:$media3_version"
+    implementation "androidx.media3:media3-exoplayer-dash:$media3_version"
+    implementation "androidx.media3:media3-exoplayer-hls:$media3_version"
+    implementation "androidx.media3:media3-ui:$media3_version"
+    implementation "androidx.media3:media3-datasource-okhttp:$media3_version"
 
     // Network
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
