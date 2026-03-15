@@ -6,9 +6,6 @@ import com.miyuki.tv.extra.M3uTool
 import com.miyuki.tv.extra.MiyukiJsonConverter
 import com.miyuki.tv.model.*
 
-// ── Top-level helper used by PlaylistHelper ──────────────────────────────────
-fun toPlaylist(text: String): Playlist? = text.toPlaylist()
-
 // ── String extensions ─────────────────────────────────────────────────────────
 fun String?.toPlaylist(): Playlist? {
     if (this.isNullOrBlank()) return null
@@ -137,7 +134,4 @@ fun Favorites?.trimNotExistFrom(playlist: Playlist?): Favorites {
     }
     return fav
 }
-
-// ── Standalone helper for calling from non-extension context ─────────────────
-fun mergeWith(target: Playlist, other: Playlist?) = target.mergeWith(other)
 
