@@ -40,7 +40,7 @@ class PlayerActivity : AppCompatActivity() {
     private val preferences  = Preferences()
     private var category: Category? = null
     private var current: Channel?   = null
-    private var player: ExoPlayer?  = null
+    private var player: SimpleExoPlayer? = null
     private lateinit var trackSelector: DefaultTrackSelector
     private lateinit var bindingRoot: ActivityPlayerBinding
     private lateinit var bindingControl: CustomControlBinding
@@ -159,7 +159,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun updateSeekBar() {
-        val isLive = player?.isCurrentMediaItemLive == true
+        val isLive = player?.isCurrentWindowLive == true
         val vis = when { isLocked -> View.INVISIBLE; isLive -> View.GONE; else -> View.VISIBLE }
         bindingControl.layoutSeekbar.visibility = vis
         bindingControl.spacerControl.visibility = vis
@@ -173,13 +173,13 @@ class PlayerActivity : AppCompatActivity() {
         val ci   = cats.indexOf(category)
         when (dir) {
             CH_NEXT  -> { val chi = category?.channels?.indexOf(current) ?: return false
-                          if (chi + 1 < (category?.channels?.size ?: 0)) current = category?.channels?.get(chi + 1)
-                          else { category = cats[(ci + 1) % cats.size]; current = category?.channels?.firstOrNull() } }
+                if (chi + 1 < (category?.channels?.size ?: 0)) current = category?.channels?.get(chi + 1)
+                else { category = cats[(ci + 1) % cats.size]; current = category?.channels?.firstOrNull() } }
             CH_PREV  -> { val chi = category?.channels?.indexOf(current) ?: return false
-                          if (chi - 1 >= 0) current = category?.channels?.get(chi - 1)
-                          else { category = cats[if (ci - 1 < 0) cats.size - 1 else ci - 1]; current = category?.channels?.lastOrNull() } }
-            CAT_UP   -> { category = cats[if (ci - 1 < 0) cats.size - 1 else ci - 1]; current = category?.channels?.firstOrNull() }
-            CAT_DOWN -> { category = cats[(ci + 1) % cats.size]; current = category?.channels?.firstOrNull() }
+                if (chi - 1 >= 0) current = category?.channels?.get(chi - 1)
+                else { category = cats[if (ci-1<0) cats.size-1 else ci-1]; current = category?.channels?.lastOrNull() } }
+            CAT_UP   -> { category = cats[if (ci-1<0) cats.size-1 else ci-1]; current = category?.channels?.firstOrNull() }
+            CAT_DOWN -> { category = cats[(ci+1) % cats.size]; current = category?.channels?.firstOrNull() }
         }
         val rci = cats.indexOf(category)
         val rchi = category?.channels?.indexOf(current) ?: 0
@@ -208,8 +208,8 @@ class PlayerActivity : AppCompatActivity() {
 
         val drmLic = Playlist.cached.drmLicenses
             .firstOrNull { current?.drmName?.equals(it.name) == true }?.url
-        val isCK  = current?.drmName?.startsWith("clearkey_") == true
-        val isWV  = current?.drmName?.startsWith("widevine_") == true
+        val isCK   = current?.drmName?.startsWith("clearkey_") == true
+        val isWV   = current?.drmName?.startsWith("widevine_") == true
         val hasDrm = !current?.drmName.isNullOrBlank() && !drmLic.isNullOrBlank()
 
         val httpFactory = DefaultHttpDataSource.Factory()
@@ -265,16 +265,16 @@ class PlayerActivity : AppCompatActivity() {
             .setDrmSessionManagerProvider { dsm }
 
         trackSelector = DefaultTrackSelector(this).apply {
-            parameters = DefaultTrackSelector.Parameters.Builder(applicationContext).build()
+            parameters = DefaultTrackSelector.ParametersBuilder(applicationContext).build()
         }
 
         val loadControl = DefaultLoadControl.Builder()
             .setAllocator(DefaultAllocator(true, 16))
-            .setBufferDurationsMs(32 * 1024, 64 * 1024, 1024, 1024)
+            .setBufferDurationsMs(32*1024, 64*1024, 1024, 1024)
             .build()
 
         player?.release()
-        player = ExoPlayer.Builder(this)
+        player = SimpleExoPlayer.Builder(this)
             .setMediaSourceFactory(msFactory)
             .setTrackSelector(trackSelector)
             .also { if (preferences.optimizePrebuffer) it.setLoadControl(loadControl) }
@@ -310,7 +310,7 @@ class PlayerActivity : AppCompatActivity() {
         AsyncSleep().task(object : AsyncSleep.Task {
             override fun onCountDown(count: Int) {
                 dlg.getButton(AlertDialog.BUTTON_POSITIVE).text =
-                    if (count <= 0) getString(R.string.btn_retry)
+                    if (count<=0) getString(R.string.btn_retry)
                     else String.format(getString(R.string.btn_retry_count), count)
             }
             override fun onFinish() { dlg.dismiss(); playChannel() }
@@ -334,7 +334,7 @@ class PlayerActivity : AppCompatActivity() {
                     R.id.mode_fixed_height -> 2
                     R.id.mode_fill         -> 3
                     R.id.mode_zoom         -> 4
-                    else                   -> 0
+                    else -> 0
                 }
                 bindingRoot.playerView.resizeMode = mode
                 preferences.resizeMode = mode; true
