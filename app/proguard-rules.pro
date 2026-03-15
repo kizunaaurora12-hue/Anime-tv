@@ -1,0 +1,3 @@
+-keep class com.miyuki.tv.model.** { *; }
+-keep class com.miyuki.tv.extra.MiyukiJsonConverter { *; }
+-dontwarn com.miyuki.tv.**
