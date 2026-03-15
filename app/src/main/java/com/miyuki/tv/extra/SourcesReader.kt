@@ -1,6 +1,7 @@
 package com.miyuki.tv.extra
 
 import com.miyuki.tv.extension.isLinkUrl
+import com.miyuki.tv.extension.toPlaylist
 import com.miyuki.tv.extension.toRequest
 import com.miyuki.tv.model.Playlist
 import com.miyuki.tv.model.Source
@@ -68,7 +69,7 @@ class SourcesReader {
                     val content = response.body()?.string()
                     runOnUiThread {
                         if (response.isSuccessful && !content.isNullOrBlank()) {
-                            val playlist = com.miyuki.tv.extension.toPlaylist(content)
+                            val playlist = content.toPlaylist()
                             if (playlist != null && !playlist.categories.isEmpty())
                                 result?.onResponse(playlist)
                             else

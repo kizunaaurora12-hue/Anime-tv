@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import com.google.gson.Gson
 import com.miyuki.tv.App
+import com.miyuki.tv.extension.toPlaylist
 import com.miyuki.tv.model.Favorites
 import com.miyuki.tv.model.Playlist
 import java.io.File
@@ -26,7 +27,7 @@ class PlaylistHelper {
     fun readFile(file: File): Playlist? {
         return try {
             val text = file.readText(Charsets.UTF_8)
-            com.miyuki.tv.extension.toPlaylist(text)
+            text.toPlaylist()
         } catch (e: Exception) { null }
     }
 
@@ -38,7 +39,7 @@ class PlaylistHelper {
             } else {
                 File(path).readText(Charsets.UTF_8)
             }
-            com.miyuki.tv.extension.toPlaylist(text)
+            text.toPlaylist()
         } catch (e: Exception) {
             Log.e(TAG, "Could not read from path: $path", e)
             null
