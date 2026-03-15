@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/color_surface">
+
+    <!-- Search input -->
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:padding="12dp" android:background="@drawable/topbar_bg">
+
+        <ImageView android:layout_width="18dp" android:layout_height="18dp"
+            android:src="@drawable/ic_search" android:layout_marginEnd="8dp"/>
+
+        <EditText android:id="@+id/input_search"
+            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/label_search_hint"
+            android:textColor="@color/color_text"
+            android:textColorHint="@color/color_text_dim"
+            android:textSize="13sp"
+            android:background="@null"
+            android:inputType="text"
+            android:singleLine="true"/>
+
+        <ImageButton android:id="@+id/btn_close"
+            android:layout_width="36dp" android:layout_height="36dp"
+            android:background="@drawable/button_control_background"
+            android:src="@drawable/ic_clear"
+            android:padding="7dp"/>
+    </LinearLayout>
+
+    <View android:layout_width="match_parent" android:layout_height="0.5dp"
+        android:background="@color/color_divider"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_search"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp"
+        android:clipToPadding="false"/>
+</LinearLayout>

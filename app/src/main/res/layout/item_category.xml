@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="catModel" type="com.miyuki.tv.model.Category"/>
+        <variable name="chAdapter" type="com.miyuki.tv.adapter.ChannelAdapter"/>
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="14dp">
+
+        <!-- Category header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingBottom="8dp">
+
+            <View android:layout_width="2dp" android:layout_height="14dp"
+                android:background="@color/color_primary"
+                android:layout_marginEnd="8dp"/>
+
+            <TextView
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@{catModel.name}"
+                android:textColor="@color/color_text"
+                android:textSize="12sp"
+                android:textStyle="bold"/>
+
+            <TextView android:id="@+id/txt_count"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textColor="@color/color_primary"
+                android:textSize="9sp"
+                android:background="@drawable/count_badge"
+                android:paddingStart="6dp" android:paddingEnd="6dp"
+                android:paddingTop="2dp" android:paddingBottom="2dp"/>
+        </LinearLayout>
+
+        <!-- Channel grid -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_channels"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adapter="@{chAdapter}"
+            android:nestedScrollingEnabled="false"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            android:clipToPadding="false"/>
+
+    </LinearLayout>
+</layout>

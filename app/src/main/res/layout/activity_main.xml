@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable name="catAdapter" type="com.miyuki.tv.adapter.CategoryAdapter"/>
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_main"
+        tools:context=".MainActivity">
+
+        <!-- ═══════════════ SIDEBAR ═══════════════ -->
+        <LinearLayout
+            android:id="@+id/sidebar"
+            android:layout_width="210dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@drawable/sidebar_bg">
+
+            <!-- Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="12dp"
+                android:background="@drawable/sidebar_header_bg">
+
+                <!-- Pink accent line -->
+                <View android:layout_width="24dp" android:layout_height="2dp"
+                    android:background="@color/color_primary"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MIYUKI"
+                    android:textColor="@color/color_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.15"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TELEVISION"
+                    android:textColor="@color/color_text_secondary"
+                    android:textSize="9sp"
+                    android:letterSpacing="0.2"
+                    android:layout_marginBottom="10dp"/>
+
+                <!-- Status card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp"
+                    android:background="@drawable/user_card_bg">
+                    <View
+                        android:layout_width="7dp"
+                        android:layout_height="7dp"
+                        android:background="@drawable/dot_green"
+                        android:layout_marginEnd="8dp"/>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Live Streaming"
+                            android:textColor="@color/color_text"
+                            android:textSize="10sp"
+                            android:textStyle="bold"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="AKTIF"
+                            android:textColor="@color/color_green"
+                            android:textSize="7sp"/>
+                    </LinearLayout>
+                    <!-- Sakura icon -->
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_emblem_star"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- KATEGORI label -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_kategori"
+                android:textColor="@color/color_text_dim"
+                android:textSize="8sp"
+                android:letterSpacing="0.2"
+                android:paddingStart="16dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="4dp"/>
+
+            <!-- Category list -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_sidebar"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:paddingBottom="4dp"
+                android:clipToPadding="false"/>
+
+            <!-- Footer: quality selector -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="10dp"
+                android:background="@drawable/sidebar_footer_bg">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_kualitas"
+                    android:textColor="@color/color_text_dim"
+                    android:textSize="7sp"
+                    android:letterSpacing="0.15"
+                    android:paddingBottom="5dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView android:id="@+id/btn360"  style="@style/ResBtn" android:text="360p"/>
+                    <TextView android:id="@+id/btn720"  style="@style/ResBtnActive" android:text="720p" android:layout_marginStart="3dp"/>
+                    <TextView android:id="@+id/btn1080" style="@style/ResBtn" android:text="1080p" android:layout_marginStart="3dp"/>
+                    <TextView android:id="@+id/btn4k"   style="@style/ResBtn" android:text="4K" android:layout_marginStart="3dp"/>
+                    <TextView android:id="@+id/btnAuto" style="@style/ResBtn" android:text="Auto" android:layout_marginStart="3dp"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Sidebar separator -->
+        <View android:layout_width="0.5dp" android:layout_height="match_parent"
+            android:background="@color/color_divider"/>
+
+        <!-- ═══════════════ MAIN AREA ═══════════════ -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- ── Top bar ── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="14dp"
+                android:paddingEnd="8dp"
+                android:background="@drawable/topbar_bg">
+
+                <!-- Current category with pink accent bar -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginEnd="12dp">
+                    <View
+                        android:layout_width="2dp"
+                        android:layout_height="16dp"
+                        android:background="@color/color_primary"
+                        android:layout_marginEnd="8dp"/>
+                    <TextView
+                        android:id="@+id/text_current_cat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SEMUA CHANNEL"
+                        android:textColor="@color/color_text"
+                        android:textSize="12sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+                <!-- Search bar -->
+                <LinearLayout
+                    android:id="@+id/search_bar_container"
+                    android:layout_width="0dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/search_bg"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:focusable="true"
+                    android:clickable="true">
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_search"
+                        android:layout_marginEnd="6dp"/>
+                    <TextView
+                        android:id="@+id/search_hint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_search_hint"
+                        android:textColor="#30F5F0FF"
+                        android:textSize="11sp"/>
+                </LinearLayout>
+
+                <!-- LIVE badge -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:background="@drawable/live_badge_bg"
+                    android:paddingStart="7dp"
+                    android:paddingEnd="7dp"
+                    android:layout_marginStart="8dp">
+                    <View
+                        android:layout_width="5dp"
+                        android:layout_height="5dp"
+                        android:background="@drawable/dot_red"
+                        android:layout_marginEnd="4dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_live"
+                        android:textColor="@color/color_red"
+                        android:textSize="8sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+                <!-- Clock -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="4dp">
+                    <TextView
+                        android:id="@+id/text_clock"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="00:00"
+                        android:textColor="@color/color_primary"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"/>
+                    <TextView
+                        android:id="@+id/text_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Min"
+                        android:textColor="@color/color_text_dim"
+                        android:textSize="7sp"/>
+                </LinearLayout>
+
+                <!-- Action buttons -->
+                <ImageButton android:id="@+id/button_search"
+                    style="@style/ImageButtonMain"
+                    android:src="@drawable/ic_search"
+                    android:layout_marginStart="4dp"/>
+                <ImageButton android:id="@+id/button_refresh"
+                    style="@style/ImageButtonMain"
+                    android:src="@drawable/ic_refresh"
+                    android:layout_marginStart="2dp"/>
+                <ImageButton android:id="@+id/button_settings"
+                    style="@style/ImageButtonMain"
+                    android:src="@drawable/ic_track_selector"
+                    android:layout_marginStart="2dp"/>
+                <ImageButton android:id="@+id/button_exit"
+                    style="@style/ImageButtonMain"
+                    android:src="@drawable/ic_exit"
+                    android:layout_marginStart="2dp"/>
+
+            </LinearLayout>
+
+            <!-- Topbar bottom border -->
+            <View android:layout_width="match_parent" android:layout_height="0.5dp"
+                android:background="@color/color_divider"/>
+
+            <!-- Content + shimmer overlay -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/main_scroll"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fillViewport="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <!-- Info / stats card -->
+                        <LinearLayout
+                            android:id="@+id/section_info"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="14dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="14dp"
+                                android:background="@drawable/trending_card_bg">
+
+                                <!-- Title row -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:layout_marginBottom="12dp">
+                                    <View android:layout_width="3dp" android:layout_height="12dp"
+                                        android:background="@color/color_primary"
+                                        android:layout_marginEnd="8dp"/>
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="MIYUKI TV"
+                                        android:textColor="@color/color_text"
+                                        android:textSize="13sp"
+                                        android:textStyle="bold"/>
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="PREMIUM"
+                                        android:textSize="8sp"
+                                        android:textColor="@color/color_primary"
+                                        android:background="@drawable/drm_badge_bg"
+                                        android:paddingStart="6dp" android:paddingEnd="6dp"
+                                        android:paddingTop="2dp" android:paddingBottom="2dp"/>
+                                </LinearLayout>
+
+                                <!-- Stats row -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                                        android:layout_weight="1" android:orientation="vertical"
+                                        android:gravity="center" android:padding="10dp"
+                                        android:background="@drawable/stats_badge_bg"
+                                        android:layout_marginEnd="5dp">
+                                        <TextView android:id="@+id/stat_total"
+                                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                            android:text="0" android:textSize="20sp" android:textStyle="bold"
+                                            android:textColor="@color/color_primary" android:fontFamily="monospace"/>
+                                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                            android:text="@string/label_channel" android:textSize="7sp"
+                                            android:textColor="@color/color_text_secondary"/>
+                                    </LinearLayout>
+
+                                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                                        android:layout_weight="1" android:orientation="vertical"
+                                        android:gravity="center" android:padding="10dp"
+                                        android:background="@drawable/stats_badge_bg"
+                                        android:layout_marginEnd="5dp">
+                                        <TextView android:id="@+id/stat_drm"
+                                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                            android:text="0" android:textSize="20sp" android:textStyle="bold"
+                                            android:textColor="@color/color_accent" android:fontFamily="monospace"/>
+                                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                            android:text="@string/label_drm" android:textSize="7sp"
+                                            android:textColor="@color/color_text_secondary"/>
+                                    </LinearLayout>
+
+                                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                                        android:layout_weight="1" android:orientation="vertical"
+                                        android:gravity="center" android:padding="10dp"
+                                        android:background="@drawable/stats_badge_bg">
+                                        <TextView android:id="@+id/stat_custom"
+                                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                            android:text="0" android:textSize="20sp" android:textStyle="bold"
+                                            android:textColor="@color/color_green" android:fontFamily="monospace"/>
+                                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                            android:text="@string/label_custom" android:textSize="7sp"
+                                            android:textColor="@color/color_text_secondary"/>
+                                    </LinearLayout>
+
+                                </LinearLayout>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Channel grid -->
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_category"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:adapter="@{catAdapter}"
+                            android:nestedScrollingEnabled="false"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="14dp"
+                            android:paddingBottom="14dp"
+                            tools:listitem="@layout/item_category"/>
+
+                    </LinearLayout>
+                </androidx.core.widget.NestedScrollView>
+
+                <!-- Shimmer loading -->
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/loading"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:shimmer_auto_start="true"
+                    android:visibility="gone">
+                    <LinearLayout android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+                        <include layout="@layout/item_category_dummy"/>
+                        <include layout="@layout/item_category_dummy"/>
+                    </LinearLayout>
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+</layout>

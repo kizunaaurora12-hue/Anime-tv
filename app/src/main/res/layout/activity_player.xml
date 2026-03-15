@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_background">
+
+    <com.google.android.exoplayer2.ui.StyledPlayerView
+        android:id="@+id/player_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:controller_layout_id="@layout/custom_control"
+        app:show_timeout="4000"
+        app:resize_mode="fit"/>
+
+    <!-- Channel info overlay (top-left) -->
+    <LinearLayout
+        android:id="@+id/layout_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_margin="16dp"
+        android:orientation="vertical"
+        android:background="@drawable/channel_info_bg"
+        android:padding="10dp"
+        android:visibility="invisible">
+
+        <TextView android:id="@+id/category_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_primary"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1"/>
+
+        <TextView android:id="@+id/channel_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_text"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginTop="2dp"/>
+
+    </LinearLayout>
+
+</FrameLayout>

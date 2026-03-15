@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable name="modelChannel" type="com.miyuki.tv.model.Channel"/>
+        <variable name="catId" type="int"/>
+        <variable name="chId"  type="int"/>
+        <variable name="clickListener" type="com.miyuki.tv.adapter.ChannelClickListener"/>
+    </data>
+
+    <LinearLayout
+        android:id="@+id/btn_play"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="7dp"
+        android:layout_margin="3dp"
+        android:background="@drawable/channel_card_bg"
+        android:focusable="true"
+        android:clickable="true"
+        android:onClick="@{() -> clickListener.onClicked(modelChannel, catId, chId)}"
+        android:onLongClick="@{() -> clickListener.onLongClicked(modelChannel, catId, chId)}">
+
+        <!-- Logo container -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/channel_logo_bg"
+            android:layout_marginBottom="5dp">
+
+            <ImageView android:id="@+id/img_logo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerInside"
+                android:padding="4dp"/>
+
+            <TextView android:id="@+id/txt_logo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textColor="@color/color_primary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:text="@{modelChannel.name != null ? modelChannel.name.substring(0,1).toUpperCase() : ``}"
+                android:visibility="gone"/>
+        </FrameLayout>
+
+        <!-- Channel name -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{modelChannel.name}"
+            android:textColor="@color/color_text"
+            android:textSize="9sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:gravity="center_horizontal"
+            android:lineSpacingMultiplier="1.1"/>
+
+        <!-- DRM badge -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DRM"
+            android:textSize="6sp"
+            android:textColor="@color/color_primary"
+            android:background="@drawable/drm_badge_bg"
+            android:paddingStart="4dp" android:paddingEnd="4dp"
+            android:paddingTop="1dp" android:paddingBottom="1dp"
+            android:layout_marginTop="2dp"
+            android:visibility="@{modelChannel.drmName != null ? android.view.View.VISIBLE : android.view.View.GONE}"/>
+
+    </LinearLayout>
+</layout>

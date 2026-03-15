@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/color_surface">
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/setting_tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color_surface_2"
+        style="@style/Widget.MaterialComponents.TabLayout"/>
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/setting_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:padding="12dp"
+        android:background="@drawable/sidebar_footer_bg">
+
+        <Button android:id="@+id/setting_cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="@string/cancel_button_label"
+            android:textColor="@color/color_text_secondary"
+            android:background="@drawable/button_rounded_background"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_marginEnd="8dp"/>
+
+        <Button android:id="@+id/setting_ok_button"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="@string/choose_button_label"
+            android:textColor="@color/color_text"
+            android:background="@drawable/corner_right"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"/>
+
+    </LinearLayout>
+</LinearLayout>
