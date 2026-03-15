@@ -6,7 +6,6 @@
     android:orientation="vertical"
     android:gravity="bottom">
 
-    <!-- Control bar -->
     <LinearLayout
         android:id="@+id/layout_control"
         android:layout_width="match_parent"
@@ -16,9 +15,9 @@
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
         android:paddingTop="8dp"
-        android:paddingBottom="12dp">
+        android:paddingBottom="14dp">
 
-        <!-- Seekbar row (VOD only) -->
+        <!-- Seekbar (VOD only) -->
         <LinearLayout android:id="@+id/layout_seekbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -40,16 +39,80 @@
             android:layout_marginBottom="8dp"
             android:visibility="gone"/>
 
-        <!-- Buttons row -->
+        <!-- Baris resolusi -->
+        <LinearLayout
+            android:id="@+id/layout_resolution"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RESOLUSI"
+                android:textColor="@color/color_text_dim"
+                android:textSize="8sp"
+                android:layout_marginEnd="8dp"/>
+
+            <TextView android:id="@+id/res_btn_auto"
+                android:layout_width="wrap_content" android:layout_height="26dp"
+                android:text="Auto" android:gravity="center"
+                android:paddingStart="10dp" android:paddingEnd="10dp"
+                android:textSize="9sp" android:textColor="@color/color_primary"
+                android:background="@drawable/res_btn_active_bg"
+                android:layout_marginEnd="4dp"/>
+
+            <TextView android:id="@+id/res_btn_360"
+                android:layout_width="wrap_content" android:layout_height="26dp"
+                android:text="360p" android:gravity="center"
+                android:paddingStart="10dp" android:paddingEnd="10dp"
+                android:textSize="9sp" android:textColor="@color/color_text_secondary"
+                android:background="@drawable/res_btn_bg"
+                android:layout_marginEnd="4dp"/>
+
+            <TextView android:id="@+id/res_btn_480"
+                android:layout_width="wrap_content" android:layout_height="26dp"
+                android:text="480p" android:gravity="center"
+                android:paddingStart="10dp" android:paddingEnd="10dp"
+                android:textSize="9sp" android:textColor="@color/color_text_secondary"
+                android:background="@drawable/res_btn_bg"
+                android:layout_marginEnd="4dp"/>
+
+            <TextView android:id="@+id/res_btn_720"
+                android:layout_width="wrap_content" android:layout_height="26dp"
+                android:text="720p" android:gravity="center"
+                android:paddingStart="10dp" android:paddingEnd="10dp"
+                android:textSize="9sp" android:textColor="@color/color_text_secondary"
+                android:background="@drawable/res_btn_bg"
+                android:layout_marginEnd="4dp"/>
+
+            <TextView android:id="@+id/res_btn_1080"
+                android:layout_width="wrap_content" android:layout_height="26dp"
+                android:text="1080p" android:gravity="center"
+                android:paddingStart="10dp" android:paddingEnd="10dp"
+                android:textSize="9sp" android:textColor="@color/color_text_secondary"
+                android:background="@drawable/res_btn_bg"/>
+
+        </LinearLayout>
+
+        <!-- Tombol utama -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <!-- Channel list toggle -->
+            <ImageButton android:id="@+id/button_channel_list"
+                style="@style/PlayerControlButton"
+                android:src="@drawable/ic_channel_list"/>
+
             <ImageButton android:id="@+id/button_previous"
                 style="@style/PlayerControlButton"
-                android:src="@drawable/ic_player_previous"/>
+                android:src="@drawable/ic_player_previous"
+                android:layout_marginStart="4dp"/>
 
             <ImageButton android:id="@+id/button_rewind"
                 style="@style/PlayerControlButton"
@@ -57,7 +120,6 @@
                 android:layout_marginStart="4dp"
                 android:visibility="gone"/>
 
-            <!-- Play/Pause (ExoPlayer managed) -->
             <ImageButton android:id="@id/exo_play"
                 style="@style/PlayerControlButton"
                 android:src="@drawable/ic_player_play"
@@ -78,28 +140,23 @@
                 android:src="@drawable/ic_player_next"
                 android:layout_marginStart="4dp"/>
 
-            <!-- Spacer -->
             <View android:layout_width="0dp" android:layout_height="1dp"
                 android:layout_weight="1"/>
 
-            <!-- Screen mode -->
             <ImageButton android:id="@+id/screen_mode"
                 style="@style/PlayerControlButton"
                 android:src="@drawable/ic_aspect_ratio"/>
 
-            <!-- Track selection -->
             <ImageButton android:id="@+id/track_selection"
                 style="@style/PlayerControlButton"
                 android:src="@drawable/ic_track_selector"
                 android:layout_marginStart="4dp"/>
 
-            <!-- Lock -->
             <ImageButton android:id="@+id/button_lock"
                 style="@style/PlayerControlButton"
                 android:src="@drawable/ic_lock_open"
                 android:layout_marginStart="4dp"/>
 
-            <!-- Exit -->
             <ImageButton android:id="@+id/button_exit"
                 style="@style/PlayerControlButton"
                 android:src="@drawable/ic_exit"

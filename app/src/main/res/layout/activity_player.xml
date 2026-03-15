@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:controller_layout_id="@layout/custom_control"
-        app:show_timeout="4000"
+        app:show_timeout="3000"
         app:resize_mode="fit"/>
 
     <!-- Channel info overlay (top-left) -->
@@ -40,7 +40,12 @@
             android:textSize="14sp"
             android:textStyle="bold"
             android:layout_marginTop="2dp"/>
-
     </LinearLayout>
+
+    <!-- Channel list panel (kanan) -->
+    <include layout="@layout/panel_channel_list"
+        android:layout_width="260dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"/>
 
 </FrameLayout>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/panel_channel_list"
+    android:layout_width="260dp"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/sidebar_bg"
+    android:visibility="gone">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="14dp"
+        android:paddingEnd="8dp"
+        android:background="@drawable/sidebar_header_bg">
+
+        <View android:layout_width="2dp" android:layout_height="16dp"
+            android:background="@color/color_primary"
+            android:layout_marginEnd="8dp"/>
+
+        <TextView
+            android:id="@+id/panel_cat_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/color_primary"
+            android:textSize="11sp"
+            android:textStyle="bold"/>
+
+        <ImageButton
+            android:id="@+id/panel_close"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/button_control_background"
+            android:src="@drawable/ic_clear"
+            android:padding="7dp"/>
+    </LinearLayout>
+
+    <!-- Channel list -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/panel_rv_channels"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:clipToPadding="false"/>
+
+</LinearLayout>
