@@ -1,167 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/custom_control"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="bottom">
+    android:layout_height="match_parent">
 
+    <!-- EXIT tombol kanan atas -->
+    <ImageButton
+        android:id="@+id/button_exit"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:background="@drawable/button_control_background"
+        android:src="@drawable/ic_exit"
+        android:padding="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- LOCK tombol kiri atas - SELALU TAMPIL -->
+    <ImageButton
+        android:id="@+id/button_lock"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:background="@drawable/button_control_background"
+        android:src="@drawable/ic_lock_open"
+        android:padding="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- CHANNEL LIST tombol kanan bawah ke-2 -->
+    <ImageButton
+        android:id="@+id/button_channel_list"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:background="@drawable/button_control_background"
+        android:src="@drawable/ic_channel_list"
+        android:padding="9dp"
+        android:layout_marginEnd="4dp"
+        app:layout_constraintBottom_toBottomOf="@+id/layout_control"
+        app:layout_constraintEnd_toStartOf="@+id/screen_mode"
+        app:layout_constraintTop_toTopOf="@+id/layout_control"/>
+
+    <!-- SCREEN MODE -->
+    <ImageButton
+        android:id="@+id/screen_mode"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:background="@drawable/button_control_background"
+        android:src="@drawable/ic_aspect_ratio"
+        android:padding="9dp"
+        android:layout_marginEnd="4dp"
+        app:layout_constraintBottom_toBottomOf="@+id/layout_control"
+        app:layout_constraintEnd_toStartOf="@+id/track_selection"
+        app:layout_constraintTop_toTopOf="@+id/layout_control"/>
+
+    <!-- TRACK SELECTION -->
+    <ImageButton
+        android:id="@+id/track_selection"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:background="@drawable/button_control_background"
+        android:src="@drawable/ic_track_selector"
+        android:padding="9dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/layout_control"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/layout_control"/>
+
+    <!-- BARIS RESOLUSI -->
+    <LinearLayout
+        android:id="@+id/layout_resolution"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/layout_control"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView android:id="@+id/res_btn_auto"
+            android:layout_width="wrap_content" android:layout_height="28dp"
+            android:text="Auto" android:gravity="center"
+            android:paddingStart="10dp" android:paddingEnd="10dp"
+            android:textSize="9sp" android:textColor="@color/color_primary"
+            android:background="@drawable/res_btn_active_bg"
+            android:layout_marginEnd="3dp"/>
+        <TextView android:id="@+id/res_btn_360"
+            android:layout_width="wrap_content" android:layout_height="28dp"
+            android:text="360p" android:gravity="center"
+            android:paddingStart="10dp" android:paddingEnd="10dp"
+            android:textSize="9sp" android:textColor="@color/color_text_secondary"
+            android:background="@drawable/res_btn_bg"
+            android:layout_marginEnd="3dp"/>
+        <TextView android:id="@+id/res_btn_480"
+            android:layout_width="wrap_content" android:layout_height="28dp"
+            android:text="480p" android:gravity="center"
+            android:paddingStart="10dp" android:paddingEnd="10dp"
+            android:textSize="9sp" android:textColor="@color/color_text_secondary"
+            android:background="@drawable/res_btn_bg"
+            android:layout_marginEnd="3dp"/>
+        <TextView android:id="@+id/res_btn_720"
+            android:layout_width="wrap_content" android:layout_height="28dp"
+            android:text="720p" android:gravity="center"
+            android:paddingStart="10dp" android:paddingEnd="10dp"
+            android:textSize="9sp" android:textColor="@color/color_text_secondary"
+            android:background="@drawable/res_btn_bg"
+            android:layout_marginEnd="3dp"/>
+        <TextView android:id="@+id/res_btn_1080"
+            android:layout_width="wrap_content" android:layout_height="28dp"
+            android:text="1080p" android:gravity="center"
+            android:paddingStart="10dp" android:paddingEnd="10dp"
+            android:textSize="9sp" android:textColor="@color/color_text_secondary"
+            android:background="@drawable/res_btn_bg"/>
+    </LinearLayout>
+
+    <!-- KONTROL UTAMA bawah kiri -->
     <LinearLayout
         android:id="@+id/layout_control"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/control_background"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="14dp">
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-        <!-- Seekbar (VOD only) -->
-        <LinearLayout android:id="@+id/layout_seekbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingBottom="8dp"
-            android:visibility="gone">
-            <com.google.android.exoplayer2.ui.DefaultTimeBar
-                android:id="@id/exo_progress"
-                android:layout_width="0dp"
-                android:layout_height="26dp"
-                android:layout_weight="1"/>
-        </LinearLayout>
+        <ImageButton android:id="@+id/button_previous"
+            android:layout_width="42dp" android:layout_height="42dp"
+            android:background="@drawable/button_control_background"
+            android:src="@drawable/ic_player_previous"
+            android:padding="9dp"/>
 
-        <View android:id="@+id/spacer_control"
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="@color/color_divider"
-            android:layout_marginBottom="8dp"
+        <ImageButton android:id="@+id/button_rewind"
+            android:layout_width="42dp" android:layout_height="42dp"
+            android:background="@drawable/button_control_background"
+            android:src="@drawable/ic_player_rewind"
+            android:padding="9dp" android:layout_marginStart="4dp"
             android:visibility="gone"/>
 
-        <!-- Baris resolusi -->
-        <LinearLayout
-            android:id="@+id/layout_resolution"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
+        <ImageButton android:id="@id/exo_play"
+            android:layout_width="42dp" android:layout_height="42dp"
+            android:background="@drawable/button_control_background"
+            android:src="@drawable/ic_player_play"
+            android:padding="9dp" android:layout_marginStart="4dp"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="RESOLUSI"
-                android:textColor="@color/color_text_dim"
-                android:textSize="8sp"
-                android:layout_marginEnd="8dp"/>
+        <ImageButton android:id="@id/exo_pause"
+            android:layout_width="42dp" android:layout_height="42dp"
+            android:background="@drawable/button_control_background"
+            android:src="@drawable/ic_player_pause"
+            android:padding="9dp" android:layout_marginStart="4dp"/>
 
-            <TextView android:id="@+id/res_btn_auto"
-                android:layout_width="wrap_content" android:layout_height="26dp"
-                android:text="Auto" android:gravity="center"
-                android:paddingStart="10dp" android:paddingEnd="10dp"
-                android:textSize="9sp" android:textColor="@color/color_primary"
-                android:background="@drawable/res_btn_active_bg"
-                android:layout_marginEnd="4dp"/>
+        <ImageButton android:id="@+id/button_forward"
+            android:layout_width="42dp" android:layout_height="42dp"
+            android:background="@drawable/button_control_background"
+            android:src="@drawable/ic_player_forward"
+            android:padding="9dp" android:layout_marginStart="4dp"
+            android:visibility="gone"/>
 
-            <TextView android:id="@+id/res_btn_360"
-                android:layout_width="wrap_content" android:layout_height="26dp"
-                android:text="360p" android:gravity="center"
-                android:paddingStart="10dp" android:paddingEnd="10dp"
-                android:textSize="9sp" android:textColor="@color/color_text_secondary"
-                android:background="@drawable/res_btn_bg"
-                android:layout_marginEnd="4dp"/>
-
-            <TextView android:id="@+id/res_btn_480"
-                android:layout_width="wrap_content" android:layout_height="26dp"
-                android:text="480p" android:gravity="center"
-                android:paddingStart="10dp" android:paddingEnd="10dp"
-                android:textSize="9sp" android:textColor="@color/color_text_secondary"
-                android:background="@drawable/res_btn_bg"
-                android:layout_marginEnd="4dp"/>
-
-            <TextView android:id="@+id/res_btn_720"
-                android:layout_width="wrap_content" android:layout_height="26dp"
-                android:text="720p" android:gravity="center"
-                android:paddingStart="10dp" android:paddingEnd="10dp"
-                android:textSize="9sp" android:textColor="@color/color_text_secondary"
-                android:background="@drawable/res_btn_bg"
-                android:layout_marginEnd="4dp"/>
-
-            <TextView android:id="@+id/res_btn_1080"
-                android:layout_width="wrap_content" android:layout_height="26dp"
-                android:text="1080p" android:gravity="center"
-                android:paddingStart="10dp" android:paddingEnd="10dp"
-                android:textSize="9sp" android:textColor="@color/color_text_secondary"
-                android:background="@drawable/res_btn_bg"/>
-
-        </LinearLayout>
-
-        <!-- Tombol utama -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <!-- Channel list toggle -->
-            <ImageButton android:id="@+id/button_channel_list"
-                style="@style/PlayerControlButton"
-                android:src="@drawable/ic_channel_list"/>
-
-            <ImageButton android:id="@+id/button_previous"
-                style="@style/PlayerControlButton"
-                android:src="@drawable/ic_player_previous"
-                android:layout_marginStart="4dp"/>
-
-            <ImageButton android:id="@+id/button_rewind"
-                style="@style/PlayerControlButton"
-                android:src="@drawable/ic_player_rewind"
-                android:layout_marginStart="4dp"
-                android:visibility="gone"/>
-
-            <ImageButton android:id="@id/exo_play"
-                style="@style/PlayerControlButton"
-                android:src="@drawable/ic_player_play"
-                android:layout_marginStart="4dp"/>
-            <ImageButton android:id="@id/exo_pause"
-                style="@style/PlayerControlButton"
-                android:src="@drawable/ic_player_pause"
-                android:layout_marginStart="4dp"/>
-
-            <ImageButton android:id="@+id/button_forward"
-                style="@style/PlayerControlButton"
-                android:src="@drawable/ic_player_forward"
-                android:layout_marginStart="4dp"
-                android:visibility="gone"/>
-
-            <ImageButton android:id="@+id/button_next"
-                style="@style/PlayerControlButton"
-                android:src="@drawable/ic_player_next"
-                android:layout_marginStart="4dp"/>
-
-            <View android:layout_width="0dp" android:layout_height="1dp"
-                android:layout_weight="1"/>
-
-            <ImageButton android:id="@+id/screen_mode"
-                style="@style/PlayerControlButton"
-                android:src="@drawable/ic_aspect_ratio"/>
-
-            <ImageButton android:id="@+id/track_selection"
-                style="@style/PlayerControlButton"
-                android:src="@drawable/ic_track_selector"
-                android:layout_marginStart="4dp"/>
-
-            <ImageButton android:id="@+id/button_lock"
-                style="@style/PlayerControlButton"
-                android:src="@drawable/ic_lock_open"
-                android:layout_marginStart="4dp"/>
-
-            <ImageButton android:id="@+id/button_exit"
-                style="@style/PlayerControlButton"
-                android:src="@drawable/ic_exit"
-                android:layout_marginStart="4dp"/>
-
-        </LinearLayout>
+        <ImageButton android:id="@+id/button_next"
+            android:layout_width="42dp" android:layout_height="42dp"
+            android:background="@drawable/button_control_background"
+            android:src="@drawable/ic_player_next"
+            android:padding="9dp" android:layout_marginStart="4dp"/>
     </LinearLayout>
-</LinearLayout>
+
+    <!-- SEEKBAR VOD -->
+    <LinearLayout
+        android:id="@+id/layout_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp" android:paddingEnd="16dp"
+        android:paddingBottom="4dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/layout_control"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        <com.google.android.exoplayer2.ui.DefaultTimeBar
+            android:id="@id/exo_progress"
+            android:layout_width="0dp"
+            android:layout_height="26dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <View android:id="@+id/spacer_control"
+        android:layout_width="0dp" android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/layout_control"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
