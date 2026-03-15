@@ -1,0 +1,90 @@
+{
+  "channels": [
+    {
+      "id": 1,
+      "name": "RCTI",
+      "cat": "nasional",
+      "url": "https://rctiplus.akamaized.net/hls/live/2002752/RCTI/index.m3u8",
+      "logo": "https://upload.wikimedia.org/wikipedia/id/thumb/5/5f/RCTI_Logo.png/120px-RCTI_Logo.png",
+      "drm": false
+    },
+    {
+      "id": 2,
+      "name": "SCTV",
+      "cat": "nasional",
+      "url": "https://5b3c4f9c4df0e.streamlock.net/sctv/smil:sctv.smil/playlist.m3u8",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/SCTV_Logo.svg/120px-SCTV_Logo.svg.png",
+      "drm": false
+    },
+    {
+      "id": 3,
+      "name": "Metro TV",
+      "cat": "berita",
+      "url": "https://d2e1asnsl7br7b.cloudfront.net/7782e205e72f43aeb4a48ec97f66ebbe/index.m3u8",
+      "logo": "https://upload.wikimedia.org/wikipedia/id/thumb/5/52/Metro_TV_logo.png/120px-Metro_TV_logo.png",
+      "drm": false
+    },
+    {
+      "id": 4,
+      "name": "CNN Indonesia",
+      "cat": "berita",
+      "url": "https://live-cnn-indonesia.indosiar.com/hls/cnnindonesia/index.m3u8",
+      "logo": "https://upload.wikimedia.org/wikipedia/id/thumb/3/32/CNN_Indonesia.png/120px-CNN_Indonesia.png",
+      "drm": false
+    },
+    {
+      "id": 5,
+      "name": "NHK World",
+      "cat": "jepang",
+      "url": "https://nhkworldjapanese-i.akamaihd.net/hls/live/2003459/nhkworldjapanese/index.m3u8",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/NHK_World_logo.svg/120px-NHK_World_logo.svg.png",
+      "drm": false
+    },
+    {
+      "id": 6,
+      "name": "Anime TV JP",
+      "cat": "jepang",
+      "url": "https://example-stream.com/anime/index.m3u8",
+      "logo": "",
+      "drm": false
+    },
+    {
+      "id": 100,
+      "name": "Vision+ ClearKey",
+      "cat": "vision",
+      "url": "https://content.uplynk.com/channel/3324f2467c414a3b8f17a4d2735aced3.m3u8",
+      "logo": "",
+      "drm": true,
+      "drmType": "ClearKey",
+      "licUrl": "eb676abbcb345e96bbcf616630f1a3da:100b6c20940f779a4589152b57d2dacb"
+    },
+    {
+      "id": 101,
+      "name": "Vision+ Widevine",
+      "cat": "vision",
+      "url": "https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd",
+      "logo": "",
+      "drm": true,
+      "drmType": "Widevine",
+      "licUrl": "https://widevine-proxy.appspot.com/proxy"
+    },
+    {
+      "id": 200,
+      "name": "IndiHome DRM",
+      "cat": "indihome",
+      "url": "https://livein-lh.akamaihd.net/i/live_1@659156/index_1_av-p.m3u8",
+      "logo": "",
+      "drm": true,
+      "drmType": "ClearKey",
+      "licUrl": "a7e61c374e37a8d14c3d4e0be4e39e5a:b1234567890abcdef1234567890abcde"
+    },
+    {
+      "id": 300,
+      "name": "Custom Stream",
+      "cat": "custom",
+      "url": "https://your-custom-stream.com/live/index.m3u8",
+      "logo": "",
+      "drm": false
+    }
+  ]
+}
