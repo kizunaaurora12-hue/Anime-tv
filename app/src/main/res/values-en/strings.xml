@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MiyukiTV</string>
+    <string name="playlist_updated">Channels updated ✓</string>
+    <string name="null_playlist">No channels available</string>
+    <string name="alert_first_time">Welcome to MiyukiTV!\n\nPremium anime-themed streaming app.\n\nEnjoy your favorite channels in the best quality.\n\nTap OK to start.</string>
+    <string name="settings">Settings</string>
+    <string name="press_back_twice_exit_app">Press back again to exit</string>
+    <string name="press_back_twice_exit_player">Press back again to exit player</string>
+    <string name="sort_category">Sort Categories</string>
+    <string name="sort_channel">Sort Channels</string>
+    <string name="sort_favorite">Sort Favorites</string>
+    <string name="play_last_watched">Play Last Watched</string>
+    <string name="launch_at_boot">Launch at Boot</string>
+    <string name="optimize_prebuffer">Optimize Pre-buffer</string>
+    <string name="reverse_player_navigation">Reverse Player Navigation</string>
+    <string name="tab_sources">Playlist</string>
+    <string name="tab_app">App</string>
+    <string name="tab_about">About</string>
+    <string name="search_channel">Search Channel</string>
+    <string name="label_search_hint">Search anime channel…</string>
+    <string name="select_language">Select Language</string>
+    <string name="language_restart_note">App will restart to apply language change</string>
+</resources>
