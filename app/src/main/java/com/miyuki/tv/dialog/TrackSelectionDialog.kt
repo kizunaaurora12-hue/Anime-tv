@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatDialog
 import androidx.fragment.app.DialogFragment
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.miyuki.tv.R
 import com.miyuki.tv.databinding.TrackSelectionDialogBinding
 
@@ -18,23 +18,18 @@ class TrackSelectionDialog : DialogFragment() {
         fun createForTrackSelector(
             trackSelector: DefaultTrackSelector,
             onDismiss: () -> Unit
-        ): TrackSelectionDialog {
-            return TrackSelectionDialog().apply {
-                this.trackSelector      = trackSelector
-                this.onDismissListener  = onDismiss
-            }
+        ): TrackSelectionDialog = TrackSelectionDialog().apply {
+            this.trackSelector     = trackSelector
+            this.onDismissListener = onDismiss
         }
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return AppCompatDialog(activity, R.style.SettingsDialogThemeOverlay).apply {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
+        AppCompatDialog(activity, R.style.SettingsDialogThemeOverlay).apply {
             setTitle(R.string.track_selection_title)
         }
-    }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = TrackSelectionDialogBinding.inflate(inflater, container, false)
         binding.btnClose.setOnClickListener { dismiss() }
         return binding.root
