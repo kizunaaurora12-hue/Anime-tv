@@ -1,9 +1,7 @@
 package com.miyuki.tv.extra
 
 import com.miyuki.tv.extension.isLinkUrl
-import com.miyuki.tv.extension.toFile
 import com.miyuki.tv.extension.toRequest
-
 import com.miyuki.tv.model.Playlist
 import com.miyuki.tv.model.Source
 import okhttp3.Call
@@ -39,13 +37,23 @@ class SourcesReader {
 
         result?.onProgress(source.path)
 
-        if (!source.path.isLinkUrl()) {
-            val playlist = PlaylistHelper().readFile(source.path.toFile())
+        // content:// URI dari SAF
+        if (source.path.startsWith("content://")) {
+            val playlist = PlaylistHelper().readFromPath(source.path)
             result?.onResponse(playlist)
             process(useCache)
             return
         }
 
+        // Local file path
+        if (!source.path.isLinkUrl()) {
+            val playlist = PlaylistHelper().readFromPath(source.path)
+            result?.onResponse(playlist)
+            process(useCache)
+            return
+        }
+
+        // Remote URL
         HttpClient(useCache)
             .create(source.path.toRequest())
             .enqueue(object : Callback {
@@ -73,6 +81,4 @@ class SourcesReader {
                 }
             })
     }
-
-
 }
