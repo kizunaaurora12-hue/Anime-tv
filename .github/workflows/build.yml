@@ -22,15 +22,15 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Install SDK Platform 33 and Build-Tools 33.0.2
+    - name: Install SDK 34 and Build-Tools 34.0.0
       run: |
         yes | sdkmanager --licenses > /dev/null 2>&1 || true
-        sdkmanager "platforms;android-33" "build-tools;33.0.2"
+        sdkmanager "platforms;android-34" "build-tools;34.0.0"
 
-    - name: Setup Gradle 7.4
+    - name: Setup Gradle 8.0
       uses: gradle/actions/setup-gradle@v3
       with:
-        gradle-version: '7.4'
+        gradle-version: '8.0'
 
     - name: Fix gradlew
       run: |
@@ -50,11 +50,11 @@ jobs:
           -dname "CN=MiyukiTV, OU=Anime, O=MiyukiTV, L=ID, S=ID, C=ID" \
           -storepass miyuki2025 -keypass miyuki2025 -noprompt
 
-        APKSIGNER="$(find ${ANDROID_HOME}/build-tools/33.0.2 -name 'apksigner' | head -1)"
+        APKSIGNER="$(find ${ANDROID_HOME}/build-tools/34.0.0 -name 'apksigner' | head -1)"
         if [ -z "$APKSIGNER" ]; then
           APKSIGNER="$(find ${ANDROID_HOME}/build-tools/ -name 'apksigner' | sort -r | head -1)"
         fi
-        echo "Using apksigner: $APKSIGNER"
+        echo "Using: $APKSIGNER"
 
         $APKSIGNER sign \
           --ks miyuki.keystore \
