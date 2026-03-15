@@ -19,13 +19,9 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
-import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector.ParametersBuilder
-import com.google.android.exoplayer2.trackselection.MappingTrackSelector.MappedTrackInfo
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.upstream.DefaultAllocator
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.util.MimeTypes
 import com.miyuki.tv.databinding.ActivityPlayerBinding
@@ -48,10 +44,9 @@ class PlayerActivity : AppCompatActivity() {
     private val preferences  = Preferences()
     private var category: Category? = null
     private var current: Channel?   = null
-    private var player: SimpleExoPlayer? = null
+    private var player: ExoPlayer? = null
     private lateinit var mediaItem: MediaItem
     private lateinit var trackSelector: DefaultTrackSelector
-    private var lastSeenTrackGroupArray: TrackGroupArray? = null
     private lateinit var bindingRoot: ActivityPlayerBinding
     private lateinit var bindingControl: CustomControlBinding
     private var handlerInfo: Handler? = null
@@ -190,12 +185,12 @@ class PlayerActivity : AppCompatActivity() {
         var vis = when {
             reset    -> View.GONE
             isLocked -> View.INVISIBLE
-            player?.isCurrentWindowLive == true -> View.GONE
+            player?.isCurrentMediaItemLive == true -> View.GONE
             else -> View.VISIBLE
         }
         bindingControl.layoutSeekbar.visibility = vis
         bindingControl.spacerControl.visibility = vis
-        if (player?.isCurrentWindowSeekable == false) vis = View.GONE
+        if (player?.isCurrentMediaItemSeekable == false) vis = View.GONE
         bindingControl.buttonRewind.visibility  = vis
         bindingControl.buttonForward.visibility = vis
     }
@@ -305,7 +300,7 @@ class PlayerActivity : AppCompatActivity() {
             .setUserAgent(userAgent)
         if (referer != null)
             httpFactory.setDefaultRequestProperties(mapOf("referer" to referer))
-        val dataSourceFactory = DefaultDataSourceFactory(this, httpFactory)
+        val dataSourceFactory = DefaultDataSource.Factory(this, httpFactory)
 
         val isClearKey = current?.drmName?.startsWith("clearkey_") == true
         val isWidevine = current?.drmName?.startsWith("widevine_") == true
@@ -382,7 +377,7 @@ class PlayerActivity : AppCompatActivity() {
             .setDrmSessionManagerProvider { drmSessionManager }
 
         trackSelector = DefaultTrackSelector(this).apply {
-            parameters = ParametersBuilder(applicationContext).build()
+            parameters = DefaultTrackSelector.Parameters.Builder(applicationContext).build()
         }
 
         val loadControl: LoadControl = DefaultLoadControl.Builder()
@@ -395,7 +390,7 @@ class PlayerActivity : AppCompatActivity() {
         val renderersFactory = DefaultRenderersFactory(this)
             .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER)
 
-        val playerBuilder = SimpleExoPlayer.Builder(this, renderersFactory)
+        val playerBuilder = ExoPlayer.Builder(this, renderersFactory)
             .setMediaSourceFactory(mediaSourceFactory)
             .setTrackSelector(trackSelector)
         if (preferences.optimizePrebuffer) playerBuilder.setLoadControl(loadControl)
@@ -450,27 +445,7 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
 
-        override fun onTracksChanged(
-            trackGroups: TrackGroupArray,
-            trackSelections: TrackSelectionArray
-        ) {
-            if (trackGroups == lastSeenTrackGroupArray) return
-            lastSeenTrackGroupArray = trackGroups
-            val mappedTrackInfo = trackSelector.currentMappedTrackInfo ?: return
-            val isVideoProblem  = mappedTrackInfo.getTypeSupport(C.TRACK_TYPE_VIDEO) ==
-                MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS
-            val isAudioProblem  = mappedTrackInfo.getTypeSupport(C.TRACK_TYPE_AUDIO) ==
-                MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS
-            val problem = when {
-                isVideoProblem && isAudioProblem -> "video & audio"
-                isVideoProblem -> "video"
-                else -> "audio"
-            }
-            val message = String.format(getString(R.string.error_unsupported), problem)
-            if (isVideoProblem) showMessage(message, false)
-            else if (isAudioProblem)
-                Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
-        }
+        // track change handling via onPlayerError
     }
 
     private fun showMessage(message: String, autoRetry: Boolean) {
@@ -585,7 +560,7 @@ class PlayerActivity : AppCompatActivity() {
                 return true
             }
         }
-        if (player?.isCurrentWindowLive == false) {
+        if (player?.isCurrentMediaItemLive == false) {
             when (keyCode) {
                 KeyEvent.KEYCODE_MEDIA_REWIND       -> { player?.seekBack(); return true }
                 KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> { player?.seekForward(); return true }
