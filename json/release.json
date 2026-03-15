@@ -1,0 +1,12 @@
+{
+  "version_name": "1.0",
+  "version_code": 1,
+  "download_url": "",
+  "changelog": [
+    "MiyukiTV - Initial release",
+    "Anime-themed premium UI",
+    "DASH + DRM ClearKey & Widevine support",
+    "Sidebar category navigation",
+    "GitHub-based channel management"
+  ]
+}
