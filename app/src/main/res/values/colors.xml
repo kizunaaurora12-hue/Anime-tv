@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base backgrounds -->
+    <color name="ic_launcher_background">#0D0B14</color>
+    <color name="color_background">#0D0B14</color>
+    <color name="color_surface">#13101E</color>
+    <color name="color_surface_2">#1A1628</color>
+    <color name="color_surface_3">#221D34</color>
+
+    <!-- Primary: sakura pink-magenta -->
+    <color name="color_primary">#E83D7A</color>
+    <color name="color_primary_light">#FF6FA3</color>
+    <color name="color_primary_dark">#B0195A</color>
+
+    <!-- Accent: soft lavender -->
+    <color name="color_accent">#C084FC</color>
+    <color name="color_accent_light">#E9D5FF</color>
+    <color name="color_accent_dark">#7C3AED</color>
+
+    <!-- Glow / highlight -->
+    <color name="color_glow">#FF2D78</color>
+    <color name="color_glow_dim">#40E83D7A</color>
+
+    <!-- Text -->
+    <color name="color_text">#F5F0FF</color>
+    <color name="color_text_secondary">#9B8BB4</color>
+    <color name="color_text_dim">#4A3F60</color>
+
+    <!-- Status -->
+    <color name="color_red">#FF4466</color>
+    <color name="color_green">#39D98A</color>
+    <color name="color_cyan">#22D3EE</color>
+    <color name="color_yellow">#FBBF24</color>
+
+    <!-- Buttons -->
+    <color name="btn_default">#1A1628</color>
+    <color name="btn_focused">#E83D7A</color>
+    <color name="btn_pressed">#FF6FA3</color>
+
+    <!-- Overlays -->
+    <color name="control_background">#CC0D0B14</color>
+    <color name="control_background_disable">#CC1A1628</color>
+    <color name="osd_inside_background">#FFFFFF</color>
+
+    <!-- Sidebar -->
+    <color name="sidebar_bg">#0F0C1A</color>
+    <color name="sidebar_selected_bg">#1E0D24</color>
+
+    <!-- Misc -->
+    <color name="color_dark">#0D0B14</color>
+    <color name="color_divider">#1AE83D7A</color>
+</resources>

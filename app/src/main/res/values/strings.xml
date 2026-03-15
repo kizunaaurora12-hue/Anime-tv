@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App -->
+    <string name="app_name">MiyukiTV</string>
+    <string name="app_tagline">✦ Anime Streaming Premium ✦</string>
+    <string name="iptv_playlist" translatable="false">https://raw.githubusercontent.com/aurorasekai15-hub/SymphogearTV/main/channels.json</string>
+    <string name="json_release" translatable="false">https://raw.githubusercontent.com/aurorasekai15-hub/SymphogearTV/main/json/release.json</string>
+    <string name="gh_contributors" translatable="false">https://api.github.com/repos/aurorasekai15-hub/SymphogearTV/contributors</string>
+    <string name="main_contributors">MiyukiTV Team</string>
+    <string name="apk_release" translatable="false">https://github.com/aurorasekai15-hub/SymphogearTV/releases/download/v%s/MiyukiTV_v%s_b%s.apk</string>
+    <string name="website" translatable="false">https://github.com/aurorasekai15-hub/SymphogearTV</string>
+    <string name="telegram_group" translatable="false">https://t.me/miyuki_tv</string>
+
+    <!-- Playlist -->
+    <string name="playlist_updated">Channel berhasil diperbarui ✓</string>
+    <string name="playlist_cant_be_parsed">Gagal memuat playlist</string>
+    <string name="null_playlist">Tidak ada channel tersedia</string>
+    <string name="must_allow_permissions">Izin diperlukan untuk mengakses file</string>
+    <string name="status_checking_permission">Memeriksa izin…</string>
+    <string name="status_checking_new_update">Memeriksa pembaruan…</string>
+    <string name="status_preparing_playlist">Memuat channel…</string>
+
+    <!-- Dialogs -->
+    <string name="settings">Pengaturan</string>
+    <string name="dialog_retry">Coba Lagi</string>
+    <string name="dialog_cached">Gunakan Cache</string>
+    <string name="dialog_download">Unduh</string>
+    <string name="dialog_ignore">Nanti</string>
+    <string name="button_website">Website</string>
+    <string name="button_telegram">Telegram</string>
+    <string name="btn_close">Tutup</string>
+    <string name="cancel_button_label">Batal</string>
+    <string name="choose_button_label">Pilih</string>
+    <string name="alert_title_playlist_error">Gagal Memuat</string>
+    <string name="alert_new_update">Update Tersedia ✦</string>
+    <string name="alert_first_time">Selamat datang di MiyukiTV!\n\nAplikasi streaming premium bertema anime.\n\nNikmati channel favorit dengan kualitas terbaik.\n\nTap OK untuk mulai.</string>
+    <string name="message_update">Versi saat ini: %s (build %d)\nVersi baru: %s (build %d)\n\nChangelog:\n</string>
+    <string name="message_update_changelog">\u2022 %s\n</string>
+    <string name="message_update_no_changelog">Tidak ada catatan perubahan.</string>
+
+    <!-- Favorites -->
+    <string name="added_into_favorite">%s ditambahkan ke favorit ♥</string>
+    <string name="removed_from_favorite">%s dihapus dari favorit</string>
+    <string name="already_in_favorite">%s sudah ada di favorit</string>
+
+    <!-- Search -->
+    <string name="name_channel">Nama Channel</string>
+    <string name="input_url">URL / Link</string>
+    <string name="search_channel">Cari Channel</string>
+
+    <!-- Settings labels -->
+    <string name="player">Player</string>
+    <string name="playlist">Playlist</string>
+    <string name="startup">Startup</string>
+    <string name="sort_category">Urutkan Kategori</string>
+    <string name="sort_channel">Urutkan Channel</string>
+    <string name="sort_favorite">Urutkan Favorit</string>
+    <string name="play_last_watched">Putar Terakhir Ditonton</string>
+    <string name="launch_at_boot">Jalankan Saat Nyala</string>
+    <string name="optimize_prebuffer">Optimasi Pre-buffer</string>
+    <string name="reverse_player_navigation">Navigasi Player Terbalik</string>
+    <string name="show_hidden">Tampilkan File Tersembunyi</string>
+
+    <!-- About -->
+    <string name="thanks_to">Terima Kasih</string>
+    <string name="thanks_for_support">Terima kasih atas dukungannya!</string>
+    <string name="more_information">Info Lebih Lanjut</string>
+
+    <!-- Splash -->
+    <string name="text_presents">— presents —</string>
+    <string name="app_tagline_one">Free · Open Source · No Ads</string>
+    <string name="app_tagline_two">Anime · Premium · DRM Support</string>
+
+    <!-- Back press -->
+    <string name="press_back_twice_exit_app">Tekan back lagi untuk keluar</string>
+    <string name="press_back_twice_exit_player">Tekan back lagi untuk keluar player</string>
+
+    <!-- Network -->
+    <string name="no_network">Tidak ada koneksi internet!</string>
+
+    <!-- Player errors -->
+    <string name="player_no_playlist">Playlist bermasalah</string>
+    <string name="player_playdata_error">Data channel tidak valid</string>
+    <string name="player_no_channel">Tidak ada channel untuk diputar</string>
+    <string name="player_playback_error">Error Pemutaran</string>
+    <string name="player_error_message" formatted="false">Code: %s\nCodeName: %s\nPesan: %s</string>
+    <string name="error_unsupported">Track %s tidak didukung perangkat ini</string>
+    <string name="device_not_support_widevine">Perangkat tidak mendukung Widevine DRM!</string>
+    <string name="btn_retry">Coba Lagi</string>
+    <string name="btn_retry_count">Coba Lagi (%d)</string>
+    <string name="btn_next_channel">Channel Berikutnya</string>
+
+    <!-- Category -->
+    <string name="top_category">Pindah ke atas</string>
+    <string name="bottom_category">Pindah ke bawah</string>
+    <string name="favorite_channel">Channel Favorit</string>
+
+    <!-- Sources -->
+    <string name="default_playlist">Playlist Default</string>
+    <string name="link_copied_to_clipboard">Link disalin!</string>
+    <string name="link_error">Link tidak valid!</string>
+    <string name="checking_url">Mengecek link…</string>
+    <string name="warning_none_source_active">Tidak ada source aktif, default diaktifkan!</string>
+    <string name="title_select_file_json">Pilih File JSON / M3U</string>
+
+    <!-- Tabs -->
+    <string name="tab_sources">Playlist</string>
+    <string name="tab_app">Aplikasi</string>
+    <string name="tab_about">Tentang</string>
+
+    <!-- Track selection -->
+    <string name="track_selection_title">Pilih Track</string>
+
+    <!-- Screen resize -->
+    <string name="mode_fit">Fit</string>
+    <string name="mode_fixed_width">Fixed Width</string>
+    <string name="mode_fixed_height">Fixed Height</string>
+    <string name="mode_fill">Fill</string>
+    <string name="mode_zoom">Zoom</string>
+
+    <!-- Language -->
+    <string name="language">Bahasa</string>
+    <string name="language_id">Indonesia</string>
+    <string name="language_en">English</string>
+    <string name="language_ja">日本語</string>
+    <string name="language_ms">Melayu</string>
+    <string name="select_language">Pilih Bahasa</string>
+    <string name="language_restart_note">Aplikasi akan restart untuk menerapkan bahasa</string>
+
+    <!-- Main stats labels -->
+    <string name="label_channel">CHANNEL</string>
+    <string name="label_drm">DRM</string>
+    <string name="label_custom">CUSTOM</string>
+    <string name="label_live">LIVE</string>
+    <string name="label_kategori">KATEGORI</string>
+    <string name="label_kualitas">KUALITAS</string>
+    <string name="label_search_hint">Cari channel anime…</string>
+</resources>

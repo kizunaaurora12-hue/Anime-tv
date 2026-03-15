@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ===== Base App Theme ===== -->
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark</item>
+        <item name="colorAccent">@color/color_accent</item>
+        <item name="android:windowBackground">@color/color_background</item>
+        <item name="android:textColor">@color/color_text</item>
+        <item name="android:statusBarColor">@color/color_background</item>
+        <item name="android:navigationBarColor">@color/color_background</item>
+    </style>
+
+    <!-- ===== Settings Dialog ===== -->
+    <style name="SettingsDialogThemeOverlay" parent="Theme.AppCompat.Dialog">
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorAccent">@color/color_primary</item>
+        <item name="android:windowBackground">@color/color_surface</item>
+        <item name="android:textColor">@color/color_text</item>
+        <item name="android:textColorSecondary">@color/color_text_secondary</item>
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
+    </style>
+
+    <!-- ===== Channel card button (D-pad focusable) ===== -->
+    <style name="ChannelButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:background">@drawable/button_channel</item>
+        <item name="android:padding">8dp</item>
+    </style>
+
+    <!-- ===== TopBar icon buttons ===== -->
+    <style name="ImageButtonMain">
+        <item name="android:layout_width">36dp</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:background">@drawable/button_control_background</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:padding">7dp</item>
+        <item name="android:focusable">true</item>
+        <item name="android:colorFilter">@color/color_text_secondary</item>
+    </style>
+
+    <!-- ===== Quality resolution buttons in sidebar ===== -->
+    <style name="ResBtn">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">22dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">7sp</item>
+        <item name="android:textColor">@color/color_text_secondary</item>
+        <item name="android:background">@drawable/res_btn_bg</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="ResBtnActive" parent="ResBtn">
+        <item name="android:textColor">@color/color_primary</item>
+        <item name="android:background">@drawable/res_btn_active_bg</item>
+    </style>
+
+    <!-- ===== Player control buttons ===== -->
+    <style name="PlayerControlButton">
+        <item name="android:layout_width">42dp</item>
+        <item name="android:layout_height">42dp</item>
+        <item name="android:background">@drawable/button_control_background</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:padding">9dp</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <!-- ===== Switch (toggle) style ===== -->
+    <style name="SettingSwitch">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:textColor">@color/color_text</item>
+        <item name="android:textSize">13sp</item>
+        <item name="colorAccent">@color/color_primary</item>
+    </style>
+
+</resources>

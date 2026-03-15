@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="sidebar_width">210dp</dimen>
+    <dimen name="topbar_height">52dp</dimen>
+    <dimen name="channel_card_height">80dp</dimen>
+    <dimen name="channel_logo_height">46dp</dimen>
+    <dimen name="sidebar_item_height">44dp</dimen>
+    <dimen name="corner_radius">10dp</dimen>
+    <dimen name="corner_radius_small">6dp</dimen>
+    <dimen name="corner_radius_large">16dp</dimen>
+    <dimen name="padding_normal">14dp</dimen>
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_large">20dp</dimen>
+</resources>
