@@ -22,15 +22,15 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Install SDK 33 and Build-Tools 33.0.1
+    - name: Install SDK 30 and Build-Tools 30.0.3
       run: |
         yes | sdkmanager --licenses > /dev/null 2>&1 || true
-        sdkmanager "platforms;android-33" "build-tools;33.0.1"
+        sdkmanager "platforms;android-30" "build-tools;30.0.3"
 
-    - name: Setup Gradle 7.5
+    - name: Setup Gradle 7.3.3
       uses: gradle/actions/setup-gradle@v3
       with:
-        gradle-version: '7.5'
+        gradle-version: '7.3.3'
 
     - name: Fix gradlew
       run: |
