@@ -17,13 +17,25 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.upstream.DefaultAllocator
-import com.google.android.exoplayer2.upstream.DefaultDataSource
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
-import com.google.android.exoplayer2.util.MimeTypes
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.okhttp.OkHttpDataSource
+import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.exoplayer.DefaultRenderersFactory
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
+import androidx.media3.exoplayer.drm.FrameworkMediaDrm
+import androidx.media3.exoplayer.drm.HttpMediaDrmCallback
+import androidx.media3.exoplayer.drm.LocalMediaDrmCallback
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.exoplayer.upstream.DefaultAllocator
+import androidx.media3.ui.AspectRatioFrameLayout
 import com.miyuki.tv.databinding.ActivityPlayerBinding
 import com.miyuki.tv.databinding.CustomControlBinding
 import com.miyuki.tv.dialog.TrackSelectionDialog
@@ -34,9 +46,11 @@ import com.miyuki.tv.model.Category
 import com.miyuki.tv.model.Channel
 import com.miyuki.tv.model.PlayData
 import com.miyuki.tv.model.Playlist
+import okhttp3.OkHttpClient
 import java.net.URLDecoder
 import java.util.*
 
+@UnstableApi
 class PlayerActivity : AppCompatActivity() {
 
     private var doubleBackToExitPressedOnce = false
@@ -44,19 +58,17 @@ class PlayerActivity : AppCompatActivity() {
     private val preferences  = Preferences()
     private var category: Category? = null
     private var current: Channel?   = null
-    private var player: ExoPlayer? = null
-    private lateinit var mediaItem: MediaItem
+    private var player: ExoPlayer?  = null
     private lateinit var trackSelector: DefaultTrackSelector
     private lateinit var bindingRoot: ActivityPlayerBinding
     private lateinit var bindingControl: CustomControlBinding
     private var handlerInfo: Handler? = null
-    private var errorCounter = 0
-    private var isLocked     = false
+    private var isLocked = false
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             when (intent.getStringExtra(PLAYER_CALLBACK)) {
-                RETRY_PLAYBACK -> retryPlayback(true)
+                RETRY_PLAYBACK -> playChannel()
                 CLOSE_PLAYER   -> finish()
             }
         }
@@ -65,9 +77,9 @@ class PlayerActivity : AppCompatActivity() {
     companion object {
         var isFirst   = true
         var isPipMode = false
-        const val PLAYER_CALLBACK  = "PLAYER_CALLBACK"
-        const val RETRY_PLAYBACK   = "RETRY_PLAYBACK"
-        const val CLOSE_PLAYER     = "CLOSE_PLAYER"
+        const val PLAYER_CALLBACK = "PLAYER_CALLBACK"
+        const val RETRY_PLAYBACK  = "RETRY_PLAYBACK"
+        const val CLOSE_PLAYER    = "CLOSE_PLAYER"
         private const val CHANNEL_NEXT     = 0
         private const val CHANNEL_PREVIOUS = 1
         private const val CATEGORY_UP      = 2
@@ -83,9 +95,7 @@ class PlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         bindingRoot    = ActivityPlayerBinding.inflate(layoutInflater)
-        bindingControl = CustomControlBinding.bind(
-            bindingRoot.root.findViewById(R.id.custom_control)
-        )
+        bindingControl = CustomControlBinding.bind(bindingRoot.root.findViewById(R.id.custom_control))
         setContentView(bindingRoot.root)
         isFirst = false
 
@@ -115,7 +125,6 @@ class PlayerActivity : AppCompatActivity() {
             .registerReceiver(broadcastReceiver, IntentFilter(PLAYER_CALLBACK))
     }
 
-    // ── Binding listeners ─────────────────────────────────────────────────────
     private fun bindingListener() {
         bindingRoot.playerView.apply {
             setOnTouchListener(object : OnSwipeTouchListener() {
@@ -124,7 +133,11 @@ class PlayerActivity : AppCompatActivity() {
                 override fun onSwipeLeft()  { switchChannel(CHANNEL_NEXT) }
                 override fun onSwipeRight() { switchChannel(CHANNEL_PREVIOUS) }
             })
-            setControllerVisibilityListener { setChannelInformation(it == View.VISIBLE) }
+            setControllerVisibilityListener(
+                androidx.media3.ui.PlayerView.ControllerVisibilityListener { vis ->
+                    setChannelInformation(vis == View.VISIBLE)
+                }
+            )
         }
         bindingControl.trackSelection.setOnClickListener { showTrackSelector() }
         bindingControl.buttonExit.apply {
@@ -139,10 +152,7 @@ class PlayerActivity : AppCompatActivity() {
         bindingControl.buttonLock.apply {
             visibility = if (isTelevision) View.GONE else View.VISIBLE
             setOnClickListener {
-                if (!isLocked) {
-                    (it as ImageButton).setImageResource(R.drawable.ic_lock)
-                    lockControl(true)
-                }
+                if (!isLocked) { (it as ImageButton).setImageResource(R.drawable.ic_lock); lockControl(true) }
             }
             setOnLongClickListener {
                 val resId = if (isLocked) R.drawable.ic_lock_open else R.drawable.ic_lock
@@ -152,86 +162,62 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    // ── Channel info overlay ──────────────────────────────────────────────────
     private fun setChannelInformation(visible: Boolean) {
         if (isLocked) return
-        bindingRoot.layoutInfo.visibility =
-            if (visible && !isPipMode) View.VISIBLE else View.INVISIBLE
+        bindingRoot.layoutInfo.visibility = if (visible && !isPipMode) View.VISIBLE else View.INVISIBLE
         if (isPipMode) return
-        if (visible == bindingRoot.playerView.isControllerVisible) return
-        if (!visible) return
-
         if (handlerInfo == null) handlerInfo = Handler(Looper.getMainLooper())
         handlerInfo?.removeCallbacksAndMessages(null)
-        handlerInfo?.postDelayed({
-            if (bindingRoot.playerView.isControllerVisible) return@postDelayed
-            bindingRoot.layoutInfo.visibility = View.INVISIBLE
-        }, bindingRoot.playerView.controllerShowTimeoutMs.toLong())
+        if (visible) {
+            handlerInfo?.postDelayed({
+                bindingRoot.layoutInfo.visibility = View.INVISIBLE
+            }, bindingRoot.playerView.controllerShowTimeoutMs.toLong())
+        }
     }
 
-    private fun lockControl(setLocked: Boolean) {
-        isLocked = setLocked
-        val vis  = if (setLocked) View.INVISIBLE else View.VISIBLE
-        bindingRoot.layoutInfo.visibility          = vis
-        bindingControl.buttonExit.visibility       = vis
-        bindingControl.layoutControl.visibility    = vis
-        bindingControl.screenMode.visibility       = vis
-        bindingControl.trackSelection.visibility   = vis
-        switchLiveOrVideo()
+    private fun lockControl(locked: Boolean) {
+        isLocked = locked
+        val vis = if (locked) View.INVISIBLE else View.VISIBLE
+        bindingRoot.layoutInfo.visibility        = vis
+        bindingControl.buttonExit.visibility     = vis
+        bindingControl.layoutControl.visibility  = vis
+        bindingControl.screenMode.visibility     = vis
+        bindingControl.trackSelection.visibility = vis
+        updateSeekVisibility()
     }
 
-    private fun switchLiveOrVideo() = switchLiveOrVideo(false)
-    private fun switchLiveOrVideo(reset: Boolean) {
-        var vis = when {
-            reset    -> View.GONE
+    private fun updateSeekVisibility() {
+        val isLive = player?.isCurrentMediaItemLive == true
+        val vis = when {
             isLocked -> View.INVISIBLE
-            player?.isCurrentMediaItemLive == true -> View.GONE
-            else -> View.VISIBLE
+            isLive   -> View.GONE
+            else     -> View.VISIBLE
         }
         bindingControl.layoutSeekbar.visibility = vis
         bindingControl.spacerControl.visibility = vis
-        if (player?.isCurrentMediaItemSeekable == false) vis = View.GONE
-        bindingControl.buttonRewind.visibility  = vis
-        bindingControl.buttonForward.visibility = vis
+        val seekVis = if (!isLive && player?.isCurrentMediaItemSeekable == true && !isLocked)
+            View.VISIBLE else View.GONE
+        bindingControl.buttonRewind.visibility  = seekVis
+        bindingControl.buttonForward.visibility = seekVis
     }
 
-    // ── Channel switching ─────────────────────────────────────────────────────
     private fun switchChannel(direction: Int): Boolean {
-        val cats = Playlist.cached.categories
+        val cats   = Playlist.cached.categories
         val catIdx = cats.indexOf(category)
         when (direction) {
             CHANNEL_NEXT -> {
                 val chIdx = category?.channels?.indexOf(current) ?: return false
-                if (chIdx + 1 < (category?.channels?.size ?: 0)) {
-                    current = category?.channels?.get(chIdx + 1)
-                } else {
-                    val nextCat = (catIdx + 1) % cats.size
-                    category = cats[nextCat]
-                    current  = category?.channels?.firstOrNull()
-                }
+                if (chIdx + 1 < (category?.channels?.size ?: 0)) current = category?.channels?.get(chIdx + 1)
+                else { val next = (catIdx + 1) % cats.size; category = cats[next]; current = category?.channels?.firstOrNull() }
             }
             CHANNEL_PREVIOUS -> {
                 val chIdx = category?.channels?.indexOf(current) ?: return false
-                if (chIdx - 1 >= 0) {
-                    current = category?.channels?.get(chIdx - 1)
-                } else {
-                    val prevCat = if (catIdx - 1 < 0) cats.size - 1 else catIdx - 1
-                    category = cats[prevCat]
-                    current  = category?.channels?.lastOrNull()
-                }
+                if (chIdx - 1 >= 0) current = category?.channels?.get(chIdx - 1)
+                else { val prev = if (catIdx - 1 < 0) cats.size - 1 else catIdx - 1; category = cats[prev]; current = category?.channels?.lastOrNull() }
             }
-            CATEGORY_UP -> {
-                val prevCat = if (catIdx - 1 < 0) cats.size - 1 else catIdx - 1
-                category = cats[prevCat]
-                current  = category?.channels?.firstOrNull()
-            }
-            CATEGORY_DOWN -> {
-                val nextCat = (catIdx + 1) % cats.size
-                category = cats[nextCat]
-                current  = category?.channels?.firstOrNull()
-            }
+            CATEGORY_UP   -> { val prev = if (catIdx - 1 < 0) cats.size - 1 else catIdx - 1; category = cats[prev]; current = category?.channels?.firstOrNull() }
+            CATEGORY_DOWN -> { category = cats[(catIdx + 1) % cats.size]; current = category?.channels?.firstOrNull() }
         }
-        // Save last watched
         val realCatId = cats.indexOf(category)
         val realChId  = category?.channels?.indexOf(current) ?: 0
         if (realCatId >= 0) preferences.watched = PlayData(realCatId, realChId)
@@ -239,75 +225,43 @@ class PlayerActivity : AppCompatActivity() {
         return true
     }
 
-    // ── DRM helpers ───────────────────────────────────────────────────────────
     private fun hexToBytes(hex: String): ByteArray {
-        val len  = hex.length
-        val data = ByteArray(len / 2)
-        for (i in 0 until len / 2)
-            data[i] = ((Character.digit(hex[i * 2], 16) shl 4) +
-                        Character.digit(hex[i * 2 + 1], 16)).toByte()
+        val data = ByteArray(hex.length / 2)
+        for (i in data.indices) data[i] = ((Character.digit(hex[i * 2], 16) shl 4) + Character.digit(hex[i * 2 + 1], 16)).toByte()
         return data
     }
 
-    private fun isDrmWidevineSupported(): Boolean {
-        if (MediaDrm.isCryptoSchemeSupported(C.WIDEVINE_UUID)) return true
-        AlertDialog.Builder(this).apply {
-            setTitle(R.string.player_playback_error)
-            setMessage(R.string.device_not_support_widevine)
-            setCancelable(false)
-            setPositiveButton(getString(R.string.btn_next_channel)) { _, _ -> switchChannel(CHANNEL_NEXT) }
-            setNegativeButton(R.string.btn_close) { _, _ -> finish() }
-            create().show()
-        }
-        return false
-    }
-
-    // ── Main play logic ───────────────────────────────────────────────────────
     private fun playChannel() {
-        switchLiveOrVideo(true)
         bindingRoot.categoryName.text = category?.name?.trim()
         bindingRoot.channelName.text  = current?.name?.trim()
 
-        var streamUrl = URLDecoder.decode(current?.streamUrl, "utf-8")
+        var streamUrl = URLDecoder.decode(current?.streamUrl ?: "", "utf-8")
         var userAgent = streamUrl.findPattern(".*user-agent=(.+?)(\\|.*)?")
         val referer   = streamUrl.findPattern(".*referer=(.+?)(\\|.*)?")
         streamUrl     = streamUrl.findPattern("(.+?)(\\|.*)?") ?: streamUrl
 
         if (userAgent == null) {
-            val agents   = listOf(*resources.getStringArray(R.array.user_agent))
-            userAgent    = agents.firstOrNull {
-                current?.streamUrl?.contains(
-                    it.substringBefore("/").lowercase()
-                ) == true
-            } ?: agents[Random().nextInt(agents.size)]
+            val agents = listOf(*resources.getStringArray(R.array.user_agent))
+            userAgent  = agents[Random().nextInt(agents.size)]
         }
 
         val drmLicense = Playlist.cached.drmLicenses
             .firstOrNull { current?.drmName?.equals(it.name) == true }?.url
 
-        val mimeType = when {
-            streamUrl.contains(".mpd",          ignoreCase = true) -> MimeTypes.APPLICATION_MPD
-            streamUrl.contains("/dash",         ignoreCase = true) -> MimeTypes.APPLICATION_MPD
-            streamUrl.contains(".m3u8",         ignoreCase = true) -> MimeTypes.APPLICATION_M3U8
-            streamUrl.contains("playlist.m3u8", ignoreCase = true) -> MimeTypes.APPLICATION_M3U8
-            streamUrl.contains("master.m3u8",   ignoreCase = true) -> MimeTypes.APPLICATION_M3U8
-            streamUrl.contains("index.m3u8",    ignoreCase = true) -> MimeTypes.APPLICATION_M3U8
-            else -> null
-        }
-
-        val httpFactory = DefaultHttpDataSource.Factory()
-            .setAllowCrossProtocolRedirects(true)
-            .setUserAgent(userAgent)
-        if (referer != null)
-            httpFactory.setDefaultRequestProperties(mapOf("referer" to referer))
-        val dataSourceFactory = DefaultDataSource.Factory(this, httpFactory)
-
         val isClearKey = current?.drmName?.startsWith("clearkey_") == true
         val isWidevine = current?.drmName?.startsWith("widevine_") == true
         val hasDrm     = !current?.drmName.isNullOrBlank() && !drmLicense.isNullOrBlank()
 
-        var drmSessionManager: com.google.android.exoplayer2.drm.DrmSessionManager =
-            com.google.android.exoplayer2.drm.DrmSessionManager.DRM_UNSUPPORTED
+        // HTTP factory
+        val okClient = OkHttpClient.Builder().build()
+        val httpFactory = OkHttpDataSource.Factory(okClient)
+            .setUserAgent(userAgent)
+        if (referer != null) httpFactory.setDefaultRequestProperties(mapOf("referer" to referer))
+        val dataSourceFactory = DefaultDataSource.Factory(this, httpFactory)
+
+        // DRM
+        var drmSessionManager: androidx.media3.exoplayer.drm.DrmSessionManager =
+            androidx.media3.exoplayer.drm.DrmSessionManager.DRM_UNSUPPORTED
 
         if (hasDrm && isClearKey) {
             try {
@@ -316,168 +270,95 @@ class PlayerActivity : AppCompatActivity() {
                 pairs.forEachIndexed { i, pair ->
                     val kv = pair.trim().split(":")
                     if (kv.size == 2) {
-                        val kidB64 = android.util.Base64.encodeToString(
-                            hexToBytes(kv[0].trim()),
-                            android.util.Base64.NO_PADDING or
-                            android.util.Base64.URL_SAFE  or
-                            android.util.Base64.NO_WRAP
-                        )
-                        val keyB64 = android.util.Base64.encodeToString(
-                            hexToBytes(kv[1].trim()),
-                            android.util.Base64.NO_PADDING or
-                            android.util.Base64.URL_SAFE  or
-                            android.util.Base64.NO_WRAP
-                        )
+                        val kid = android.util.Base64.encodeToString(hexToBytes(kv[0].trim()),
+                            android.util.Base64.NO_PADDING or android.util.Base64.URL_SAFE or android.util.Base64.NO_WRAP)
+                        val key = android.util.Base64.encodeToString(hexToBytes(kv[1].trim()),
+                            android.util.Base64.NO_PADDING or android.util.Base64.URL_SAFE or android.util.Base64.NO_WRAP)
                         if (i > 0) keysJson.append(",")
-                        keysJson.append("{\"kty\":\"oct\",\"kid\":\"$kidB64\",\"k\":\"$keyB64\"}")
+                        keysJson.append("{\"kty\":\"oct\",\"kid\":\"$kid\",\"k\":\"$key\"}")
                     }
                 }
                 keysJson.append("],\"type\":\"temporary\"}")
-                val licenseBytes = keysJson.toString().toByteArray(Charsets.UTF_8)
-                val drmCallback  =
-                    com.google.android.exoplayer2.drm.LocalMediaDrmCallback(licenseBytes)
-                drmSessionManager =
-                    com.google.android.exoplayer2.drm.DefaultDrmSessionManager.Builder()
-                        .setUuidAndExoMediaDrmProvider(
-                            C.CLEARKEY_UUID,
-                            com.google.android.exoplayer2.drm.FrameworkMediaDrm.DEFAULT_PROVIDER
-                        )
-                        .setMultiSession(false)
-                        .build(drmCallback)
+                drmSessionManager = DefaultDrmSessionManager.Builder()
+                    .setUuidAndExoMediaDrmProvider(C.CLEARKEY_UUID, FrameworkMediaDrm.DEFAULT_PROVIDER)
+                    .setMultiSession(false)
+                    .build(LocalMediaDrmCallback(keysJson.toString().toByteArray()))
                 Log.d("DRM", "ClearKey OK")
-            } catch (e: Exception) {
-                Log.e("DRM", "ClearKey build error: ${e.message}")
-            }
+            } catch (e: Exception) { Log.e("DRM", "ClearKey error: ${e.message}") }
         } else if (hasDrm && isWidevine) {
-            if (!isDrmWidevineSupported()) return
-            val drmCallback =
-                com.google.android.exoplayer2.drm.HttpMediaDrmCallback(drmLicense, httpFactory)
-            drmSessionManager =
-                com.google.android.exoplayer2.drm.DefaultDrmSessionManager.Builder()
-                    .setUuidAndExoMediaDrmProvider(
-                        C.WIDEVINE_UUID,
-                        com.google.android.exoplayer2.drm.FrameworkMediaDrm.DEFAULT_PROVIDER
-                    )
-                    .setMultiSession(true)
-                    .build(drmCallback)
-            Log.d("DRM", "Widevine OK licUrl=$drmLicense")
-        } else if (!current?.drmName.isNullOrBlank() && drmLicense == null) {
-            Log.e("DRM", "DRM channel but license NOT FOUND")
-            Toast.makeText(applicationContext,
-                "DRM license tidak ditemukan, coba refresh playlist",
-                Toast.LENGTH_LONG).show()
+            if (!MediaDrm.isCryptoSchemeSupported(C.WIDEVINE_UUID)) {
+                Toast.makeText(this, R.string.device_not_support_widevine, Toast.LENGTH_LONG).show()
+                switchChannel(CHANNEL_NEXT); return
+            }
+            val drmCallback = HttpMediaDrmCallback(drmLicense, DefaultHttpDataSource.Factory())
+            drmSessionManager = DefaultDrmSessionManager.Builder()
+                .setUuidAndExoMediaDrmProvider(C.WIDEVINE_UUID, FrameworkMediaDrm.DEFAULT_PROVIDER)
+                .setMultiSession(true)
+                .build(drmCallback)
+            Log.d("DRM", "Widevine OK")
         }
 
-        mediaItem = MediaItem.Builder()
-            .setUri(Uri.parse(streamUrl))
-            .also { if (mimeType != null) it.setMimeType(mimeType) }
-            .build()
-
+        val mediaItem = MediaItem.Builder().setUri(Uri.parse(streamUrl)).build()
         val mediaSourceFactory = DefaultMediaSourceFactory(dataSourceFactory)
             .setDrmSessionManagerProvider { drmSessionManager }
 
-        trackSelector = DefaultTrackSelector(this).apply {
-            parameters = DefaultTrackSelector.Parameters.Builder(applicationContext).build()
-        }
-
-        val loadControl: LoadControl = DefaultLoadControl.Builder()
-            .setAllocator(DefaultAllocator(true, 16))
-            .setBufferDurationsMs(32 * 1024, 64 * 1024, 1024, 1024)
-            .setTargetBufferBytes(-1)
-            .setPrioritizeTimeOverSizeThresholds(true)
-            .build()
+        trackSelector = DefaultTrackSelector(this)
 
         val renderersFactory = DefaultRenderersFactory(this)
             .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER)
 
-        val playerBuilder = ExoPlayer.Builder(this, renderersFactory)
-            .setMediaSourceFactory(mediaSourceFactory)
-            .setTrackSelector(trackSelector)
-        if (preferences.optimizePrebuffer) playerBuilder.setLoadControl(loadControl)
+        val loadControl = DefaultLoadControl.Builder()
+            .setAllocator(DefaultAllocator(true, 16))
+            .setBufferDurationsMs(32 * 1024, 64 * 1024, 1024, 1024)
+            .build()
 
         player?.release()
-        player = playerBuilder.build()
-        player?.addListener(PlayerListener())
-        player?.resizeMode = preferences.resizeMode
+        player = ExoPlayer.Builder(this, renderersFactory)
+            .setMediaSourceFactory(mediaSourceFactory)
+            .setTrackSelector(trackSelector)
+            .also { if (preferences.optimizePrebuffer) it.setLoadControl(loadControl) }
+            .build()
 
-        bindingRoot.playerView.player       = player
-        bindingRoot.playerView.resizeMode   = preferences.resizeMode
+        player?.addListener(object : Player.Listener {
+            override fun onPlaybackStateChanged(state: Int) {
+                if (state == Player.STATE_READY) updateSeekVisibility()
+            }
+            override fun onPlayerError(error: PlaybackException) {
+                showErrorDialog(error.message ?: "Unknown error")
+            }
+        })
+
+        bindingRoot.playerView.player      = player
+        bindingRoot.playerView.resizeMode  = preferences.resizeMode
         bindingRoot.playerView.useController = true
 
         player?.setMediaItem(mediaItem)
         player?.prepare()
         player?.playWhenReady = true
-
-        errorCounter = 0
     }
 
-    private fun retryPlayback(resetCounter: Boolean) {
-        if (resetCounter) errorCounter = 0
-        playChannel()
-    }
-
-    // ── ExoPlayer listener ────────────────────────────────────────────────────
-    private inner class PlayerListener : Player.Listener {
-        override fun onPlaybackStateChanged(state: Int) {
-            when (state) {
-                Player.STATE_READY   -> switchLiveOrVideo()
-                Player.STATE_BUFFERING -> { /* show buffering indicator */ }
-                else -> { /* idle / ended */ }
-            }
-        }
-
-        override fun onPlayerError(error: PlaybackException) {
-            errorCounter++
-            if (errorCounter <= 3) {
-                showMessage(
-                    String.format(
-                        getString(R.string.player_error_message),
-                        error.errorCode, error.errorCodeName, error.message
-                    ), true
-                )
-            } else {
-                showMessage(
-                    String.format(
-                        getString(R.string.player_error_message),
-                        error.errorCode, error.errorCodeName, error.message
-                    ), true
-                )
-            }
-        }
-
-        // track change handling via onPlayerError
-    }
-
-    private fun showMessage(message: String, autoRetry: Boolean) {
+    private fun showErrorDialog(message: String) {
         val waitSec = 30
-        val builder = AlertDialog.Builder(this).apply {
+        val dlg = AlertDialog.Builder(this).apply {
             setTitle(R.string.player_playback_error)
             setMessage(message)
             setCancelable(false)
-            setNegativeButton(getString(R.string.btn_next_channel)) { di, _ ->
-                switchChannel(CHANNEL_NEXT); di.dismiss()
-            }
-            setPositiveButton(
-                if (autoRetry) String.format(getString(R.string.btn_retry_count), waitSec)
-                else getString(R.string.btn_retry)
-            ) { di, _ -> retryPlayback(true); di.dismiss() }
-            setNeutralButton(R.string.btn_close) { di, _ -> di.dismiss(); finish() }
-            create()
-        }
-        val dialog = builder.show()
-        if (!autoRetry) return
+            setNegativeButton(R.string.btn_next_channel) { d, _ -> switchChannel(CHANNEL_NEXT); d.dismiss() }
+            setPositiveButton(String.format(getString(R.string.btn_retry_count), waitSec)) { d, _ -> playChannel(); d.dismiss() }
+            setNeutralButton(R.string.btn_close) { d, _ -> d.dismiss(); finish() }
+        }.show()
         AsyncSleep().task(object : AsyncSleep.Task {
             override fun onCountDown(count: Int) {
-                val text = if (count <= 0) getString(R.string.btn_retry)
-                else String.format(getString(R.string.btn_retry_count), count)
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).text = text
+                dlg.getButton(AlertDialog.BUTTON_POSITIVE).text =
+                    if (count <= 0) getString(R.string.btn_retry)
+                    else String.format(getString(R.string.btn_retry_count), count)
             }
-            override fun onFinish() { dialog.dismiss(); retryPlayback(true) }
+            override fun onFinish() { dlg.dismiss(); playChannel() }
         }).start(waitSec)
     }
 
     private fun showTrackSelector(): Boolean {
-        TrackSelectionDialog.createForTrackSelector(trackSelector) { }
+        TrackSelectionDialog.createForTrackSelector(trackSelector) {}
             .show(supportFragmentManager, null)
         return true
     }
@@ -489,26 +370,21 @@ class PlayerActivity : AppCompatActivity() {
             inflate(R.menu.screen_resize_mode)
             setOnMenuItemClickListener { m ->
                 val mode = when (m.itemId) {
-                    R.id.mode_fixed_width  -> 1
-                    R.id.mode_fixed_height -> 2
-                    R.id.mode_fill         -> 3
-                    R.id.mode_zoom         -> 4
-                    else                   -> 0
+                    R.id.mode_fixed_width  -> AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
+                    R.id.mode_fixed_height -> AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
+                    R.id.mode_fill         -> AspectRatioFrameLayout.RESIZE_MODE_FILL
+                    R.id.mode_zoom         -> AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                    else                   -> AspectRatioFrameLayout.RESIZE_MODE_FIT
                 }
-                if (bindingRoot.playerView.resizeMode != mode) {
-                    bindingRoot.playerView.resizeMode = mode
-                    preferences.resizeMode = mode
-                }
+                bindingRoot.playerView.resizeMode = mode
+                preferences.resizeMode = mode
                 true
             }
-            setOnDismissListener {
-                bindingRoot.playerView.controllerShowTimeoutMs = timeout
-            }
+            setOnDismissListener { bindingRoot.playerView.controllerShowTimeoutMs = timeout }
             show()
         }
     }
 
-    // ── Lifecycle ─────────────────────────────────────────────────────────────
     override fun onResume()  { super.onResume();  player?.playWhenReady = true }
     override fun onPause()   { super.onPause();   player?.playWhenReady = false }
 
@@ -516,20 +392,15 @@ class PlayerActivity : AppCompatActivity() {
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
         if (player?.isPlaying == false) return
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val params = android.app.PictureInPictureParams.Builder().build()
-                enterPictureInPictureMode(params)
-            } else {
-                enterPictureInPictureMode()
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            enterPictureInPictureMode(android.app.PictureInPictureParams.Builder().build())
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            enterPictureInPictureMode()
         }
     }
 
     override fun onPictureInPictureModeChanged(pip: Boolean, config: Configuration) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            super.onPictureInPictureModeChanged(pip, config)
-        }
+        super.onPictureInPictureModeChanged(pip, config)
         isPipMode = pip
         setChannelInformation(!pip)
         bindingRoot.playerView.useController = !pip
@@ -542,8 +413,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
-        if (!bindingRoot.playerView.isControllerVisible &&
-            keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+        if (!bindingRoot.playerView.isControllerFullyVisible && keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
             bindingRoot.playerView.showController(); return true
         }
         if (isLocked) return true
@@ -556,34 +426,25 @@ class PlayerActivity : AppCompatActivity() {
             KeyEvent.KEYCODE_MEDIA_PLAY     -> { player?.play(); return true }
             KeyEvent.KEYCODE_MEDIA_PAUSE    -> { player?.pause(); return true }
             KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
-                if (player?.isPlaying == false) player?.play() else player?.pause()
-                return true
+                if (player?.isPlaying == false) player?.play() else player?.pause(); return true
             }
         }
-        if (player?.isCurrentMediaItemLive == false) {
-            when (keyCode) {
-                KeyEvent.KEYCODE_MEDIA_REWIND       -> { player?.seekBack(); return true }
-                KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> { player?.seekForward(); return true }
-            }
-        }
-        if (bindingRoot.playerView.isControllerVisible) return super.onKeyUp(keyCode, event)
-        val reverse = preferences.reverseNavigation
+        if (bindingRoot.playerView.isControllerFullyVisible) return super.onKeyUp(keyCode, event)
+        val rev = preferences.reverseNavigation
         when (keyCode) {
-            KeyEvent.KEYCODE_DPAD_UP    -> return switchChannel(if (!reverse) CHANNEL_PREVIOUS else CHANNEL_NEXT)
-            KeyEvent.KEYCODE_DPAD_DOWN  -> return switchChannel(if (!reverse) CHANNEL_NEXT     else CHANNEL_PREVIOUS)
-            KeyEvent.KEYCODE_DPAD_LEFT  -> return switchChannel(if (!reverse) CATEGORY_UP      else CATEGORY_DOWN)
-            KeyEvent.KEYCODE_DPAD_RIGHT -> return switchChannel(if (!reverse) CATEGORY_DOWN    else CATEGORY_UP)
+            KeyEvent.KEYCODE_DPAD_UP    -> return switchChannel(if (!rev) CHANNEL_PREVIOUS else CHANNEL_NEXT)
+            KeyEvent.KEYCODE_DPAD_DOWN  -> return switchChannel(if (!rev) CHANNEL_NEXT     else CHANNEL_PREVIOUS)
+            KeyEvent.KEYCODE_DPAD_LEFT  -> return switchChannel(if (!rev) CATEGORY_UP      else CATEGORY_DOWN)
+            KeyEvent.KEYCODE_DPAD_RIGHT -> return switchChannel(if (!rev) CATEGORY_DOWN    else CATEGORY_UP)
         }
         return super.onKeyUp(keyCode, event)
     }
 
     override fun onBackPressed() {
         if (isLocked) return
-        if (isTelevision || doubleBackToExitPressedOnce) {
-            super.onBackPressed(); finish(); return
-        }
+        if (isTelevision || doubleBackToExitPressedOnce) { super.onBackPressed(); finish(); return }
         doubleBackToExitPressedOnce = true
-        Toast.makeText(this, getString(R.string.press_back_twice_exit_player), Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, R.string.press_back_twice_exit_player, Toast.LENGTH_SHORT).show()
         Handler(Looper.getMainLooper()).postDelayed({ doubleBackToExitPressedOnce = false }, 2000)
     }
 
@@ -592,5 +453,4 @@ class PlayerActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver)
         super.onDestroy()
     }
-
 }
